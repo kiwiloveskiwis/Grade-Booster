@@ -1,0 +1,94 @@
+<html>
+	<head>
+
+	</head>
+
+	<body>
+		<table width="100%" border = "1" cellpadding="10">
+			<tr>
+				<td align="center">
+					<h1> Gene Information Database </h1>
+					<h2> CS411 </h2>
+					<h3> For Demo Purpose Only! </h3>
+				</td>
+			</tr>
+
+			<td class="topnav_middle">&nbsp;<a href="index.html" class="topnav" title="Gene homepage">Home</a> &nbsp;
+			</td>
+			<tr>
+			<td align="center">
+				<table width="640" border="0" cellpadding="3">
+					<td width="45%">
+						<div class="center">
+							<h4>Sign In:</h4>
+							<form action="demo_sign_in.php" method="post" target="_blank">
+								<p align= "left">
+								 Username:&nbsp <input name="username" type="text" /><br/>
+								 Password:&nbsp <input name="password" type="password" /><br/>
+								<input name="Sign In" type="submit" value="Sign In" /><br/>
+								</p>
+							</form>
+
+							<h4>Sign Up:</h4>
+							<form action="demo_sign_up.php" method="post" target="_blank">
+								<p align= "left">
+								Requested Username:<br/> <input name="username" type="text" /><br/>
+								Requested Password:<br/> <input name="password" type="password" /><br/>
+								Email:<br/> <input name="email" type="text" /><br/>
+								<input name="Sign Up" type="submit" value="Sign Up" />
+								</p>
+								<br/>
+							</form>
+						</div>
+					</td>
+
+
+					<td valign="center">
+					<br/> <br/>  <br/>
+					<img src="arabidop1.png" alt="Demo Picture"/>
+					</td>
+
+
+
+					<td width="41%">
+						<div class="center">
+							<br/> <br/> <br/>
+							<form action="search.php" method="get" target="_blank">
+								<h4>Search For a Gene:</h4>
+
+								<p align= "left">
+								<input type="radio" name="attr" value="Gene No" checked />Gene No.<br/>
+								<input type="radio" name="attr" value="Gene ID" />Gene ID<br/>
+								<input type="radio" name="attr" value="Gene Symbol" />Gene Symbol<br/>
+								<input type="radio" name="attr" value="Gene Name" />Gene Name<br/>
+								<input type="text" name="q" /><br/>
+								<input type="submit" value="Search" /><br/>
+								<text align="center"> <br/> <b>Note:  <br/> Enter a No. between 1 and 5 to search for a gene from the database. <br/> Then you can repeat the search by knowing the <u>Gene ID, Gene Symbol or Gene Name<u/>. <b/><text/>
+								</p>
+
+							</form>
+						</div>
+					</td>
+				</table>
+			    </td>
+			</tr>
+		</table>
+
+
+
+		<br/>
+		<p class="footer" align="center">
+			<a href="sitemap.html">
+				<b>Sitemap<b/>
+			</a>
+			&nbsp
+			<a href="contact.html">
+				<b>Contact<b/>
+			</a>
+			&nbsp
+			<a href="index.html">
+				<b>Main page<b/>
+			</a>
+		</p>
+	</body>
+</html>
