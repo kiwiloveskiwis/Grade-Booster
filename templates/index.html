@@ -80,6 +80,7 @@
             <p>&copy; Database for BaselessData 2018</p>
          </div>
          <!-- ------------- -->
+
          <!-- Sign Up Modal -->
          <div class="modal fade" id="signUpModal" tabindex="-1" role="dialog" aria-labelledby="signUp" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -90,34 +91,45 @@
                      <span aria-hidden="true">&times;</span>
                      </button>
                   </div>
+
+                  <form method='post' action='/signUp'>
+
                   <div class="modal-body">
-                     <form>
+       <!--                 <div class="control-group">
+                          <label class="control-label" for="name">Name:</label>
+                          <div class="controls">
+                             <input required="" name="name" type="text" class="form-control" placeholder="John Doe" class="input-medium">
+                          </div>
+                       </div> 
+        -->
                         <!-- Text input-->
                         <div class="control-group">
-                           <label class="control-label" for="userid">Email:</label>
+                           <label class="control-label" for="email">Email:</label>
                            <div class="controls">
-                              <input required="" id="userid" name="userid" type="text" class="form-control" placeholder="Do_not@email.me" class="input-medium" required="">
+                              <input required="" name="email" type="email" class="form-control" placeholder="Do_not@email.me" class="input-medium" required="">
                            </div>
                         </div>
                         <!-- Password input-->
                         <div class="control-group">
-                           <label class="control-label" for="passwordinput">Password:</label>
+                           <label class="control-label" for="password">Password:</label>
                            <div class="controls">
-                              <input required="" id="passwordinput" name="passwordinput" class="form-control" type="password" placeholder="VerySecret123" class="input-medium">
+                              <input required="" name="password" class="form-control" type="password" placeholder="VerySecret123" class="input-medium">
                            </div>
                         </div>
-
-                     </form>
+                     
                   </div>
                   <div class="modal-footer">
                      <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
-                     <button type="button" class="btn btn-outline-info">
-                     <a href="signUp">Sign Up!</a>
-                     </button>
+                     <button type="submit" class="btn btn-outline-info"> Sign Up/Sign In </button>
                   </div>
+                  </form>
+
                </div>
             </div>
          </div>
+         <!-- End of Modal -->
+
+         
          </div> <!-- /container -->
          <!-- Bootstrap core JavaScript
          ================================================== -->
