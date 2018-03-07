@@ -34,13 +34,12 @@ def login():
     # TODO: Do your thing here
     return redirect('/')
 
-@app.route('/signUp', methods=['POST', 'GET'])
+@app.route('/signUp', methods=['POST'])
 def signUp():
     _email = request.form['email']
     _password = request.form['password']
     # _name = request.form['name']
-    print(_email,_password, _name)
-    # TODO: Do your thing here
+    print(_email,_password)
     try:
         # TODO: Convert this query to python
         # SQL: INSERT INTO Users VALUES ({_email}, {_password}, {_name})
