@@ -10,13 +10,6 @@
       <!-- Bootstrap core CSS -->
       <!-- Custom styles for this template -->
       <link href="../static/stylesheets/css/boot.css" rel="stylesheet">
-      <!-- Just for debugging purposes. Don't actually copy this line! -->
-      <!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-      <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-      <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-      <![endif]-->
    </head>
    <body>
       <div class="container">
@@ -45,17 +38,18 @@
                         <a class="dropdown-item" href="/example.html">CS 411 Example Page</a>
                      </div>
                   </li>
-                  <li>
-                    <a class="nav-link" href="#login" data-toggle="modal" role="button" data-target="#signUpModal">Login</a>
-                  </li>
+<!--                   <li>
+                    <a class="nav-link" href="#signUp" data-toggle="modal" role="button" data-target="#signUpModal">Login</a>
+                  </li> -->
                </ul>
                <form class="form-inline my-2 my-lg-0">
-                  <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                  <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="autocomplete" class="form-control">
                   <button class="btn btn-outline-info my-2 my-sm-0" type="submit">Search</button>
                </form>
             </div>
          </nav>
          <!-- Main Paragraph  -->
+
          <div class="jumbotron">
             <h1 style="color:#17a2b8;">Grade Booster</h1>
             <p class="lead">Help student get A++! We display the grade distribution and relevant statistics for each course and instructor at UIUC. Features may include easy-comparisons of several courses you choose, fancy visualization, and discussion room. This saves your GPA. </p>
@@ -82,14 +76,13 @@
          <div class="footer">
             <p>&copy; Database for BaselessData 2018</p>
          </div>
-         <!-- ------------- -->
 
          <!-- Sign Up Modal -->
          <div class="modal fade" id="signUpModal" tabindex="-1" role="dialog" aria-labelledby="signUp" aria-hidden="true">
             <div class="modal-dialog" role="document">
                <div class="modal-content">
                   <div class="modal-header">
-                     <h5 class="modal-title" id="exampleModalLabel">New Account</h5>
+                     <h5 class="modal-title" id="exampleModalLabel">My Account</h5>
                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                      <span aria-hidden="true">&times;</span>
                      </button>
@@ -98,19 +91,6 @@
                   <form method='post' action='/signUp'>
 
                   <div class="modal-body">
-
-       <!--                 <div class="control-group">
-=======
-                     <form method='post' action='/signUp'>
-                       <div class="control-group">
->>>>>>> 2ece469bfdd1fa6378fb123d96e2dd533f7ec82b
-                          <label class="control-label" for="name">Name:</label>
-                          <div class="controls">
-                             <input required="" name="name" type="text" class="form-control" placeholder="John Doe" class="input-medium">
-                          </div>
-<<<<<<< HEAD
-                       </div> 
-        -->
                         <!-- Text input-->
                         <div class="control-group">
                            <label class="control-label" for="email">Email:</label>
@@ -136,10 +116,31 @@
          </div>
          <!-- End of Modal -->
          </div> <!-- /container -->
-         <!-- Bootstrap core JavaScript
+
+         <!-- JavaScript 
          ================================================== -->
-         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+         <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.js"></script>
+         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> -->
          <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+         <script type="text/javascript">
+         $(function() {
+             $("#autocomplete").autocomplete({
+                 source:function(request, response) {
+                     $.getJSON("{{url_for('autocomplete')}}",{
+                         q_course: request.term, 
+                     }, function(data) {
+                         response(data.matching_courses); 
+                     });
+                 },
+                 minLength: 2,
+                 select: function(event, ui) {
+                     console.log(ui.item.value); 
+                 }
+             });
+         })
+         </script>
+
       </body>
    </html>

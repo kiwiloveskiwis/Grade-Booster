@@ -1,5 +1,6 @@
-from flask import Flask, render_template, json, request, redirect, abort, session
-from flask.ext.mysql import MySQL
+from flask import Flask, Response, render_template, json, request, redirect, abort, session, jsonify
+from flaskext.mysql import MySQL
+import json
 from werkzeug import generate_password_hash, check_password_hash
 
 mysql = MySQL()
@@ -14,9 +15,14 @@ app.config['SECRET_KEY'] = 'streamliner18 was here'
 mysql.init_app(app)
 
 
-@app.route('/')
-def main():
-    return render_template('index.html')
+@app.route('/autocomplete', methods=['GET'])
+def autocomplete():
+    search = request.args.get('q_course')
+    print(search)
+    # query = db_session.query(Course.title).filter(Course.title.like('%' + str(search) + '%'))
+    # TODO: replace below with above
+    results = ['CS411', 'CS543'] # just to check the autocompletion works
+    return jsonify(matching_courses=results)
 
 @app.route('/search')
 def search():
@@ -26,19 +32,10 @@ def search():
     print(data)
     return main();
 
-@app.route('/login', methods=['POST'])
-def login():
-    _email = request.form['email']
-    _password = request.form['password']
-    print(_email,_password)
-    # TODO: Do your thing here
-    return redirect('/')
-
 @app.route('/signUp', methods=['POST'])
 def signUp():
     _email = request.form['email']
     _password = request.form['password']
-    # _name = request.form['name']
     print(_email,_password)
     try:
         # TODO: Convert this query to python
@@ -67,6 +64,9 @@ def signUp():
     except Exception as e:
         abort(401)
 
+@app.route('/')
+def main():
+    return render_template('index.html')
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
