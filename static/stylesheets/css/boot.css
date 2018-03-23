@@ -91,8 +91,6 @@ body {
 }
 
 
-
-
 /* Auto complete box style */
 .ui-autocomplete {
   position: absolute;
@@ -121,7 +119,7 @@ body {
   -moz-background-clip: padding;
   background-clip: padding-box;
 
-  .ui-menu-item > a.ui-corner-all {
+/*  .ui-menu-item > a.ui-corner-all {
     display: block;
     padding: 3px 15px;
     clear: both;
@@ -139,5 +137,16 @@ body {
       -moz-border-radius: 0px;
       background-image: none;
     }
-  }
+  }*/
+}
+
+li.ui-state-focus{
+      text-decoration: none;
+      text-decoration-line: underline;
+      text-decoration-style: wavy;
+/*       background-color: #0088cc73; */
+      border-radius: 0px;
+      -webkit-border-radius: 0px;
+      -moz-border-radius: 0px;
+      background-image: none;
 }

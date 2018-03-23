@@ -24,9 +24,17 @@ def autocomplete():
     results = ['CS411', 'CS543'] # just to check the autocompletion works
     return jsonify(matching_courses=results)
 
-@app.route('/search')
+@app.route('/search', methods=['POST', 'GET'])
 def search():
+    search_q = request.form['q']
+    # TODO: replace below with search from db
+    print("You just searched", search_q)
+    return main();
+
+@app.route('/explore')
+def explore():
     cursor = mysql.connect().cursor()
+    # TODO: replace below with random search from db
     cursor.execute("SELECT * from `Gene`")
     data = cursor.fetchone()
     print(data)
@@ -36,7 +44,7 @@ def search():
 def signUp():
     _email = request.form['email']
     _password = request.form['password']
-    print(_email,_password)
+    print(_email, _password)
     try:
         # TODO: Convert this query to python
         # SQL: INSERT INTO Users VALUES ({_email}, {_password}, {_name})
