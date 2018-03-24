@@ -71,22 +71,35 @@ def signUp():
             cur = conn.cursor()
             print (conn, cur)
 
-            _hashed_password = generate_password_hash(_password)
-            print (_hashed_password)
-
-            cur.callproc('sp_createUser', (_email, _hashed_password))
+            # check user existence first
+            # q = "SELECT * FROM tbl_user WHERE email=\"{}\" AND password_hash=\"{}\";".format(_email, _hashed_password)
+            q = "SELECT * FROM tbl_user WHERE email=\"{}\";".format(_email)
+            print (q)
+            cur.execute(q)
             data = cur.fetchall()
             print (data)
 
-            if len(data) is 0:
-                conn.commit()
-                return json.dumps({'message':'User created successfully !'})
+            if len(data) == 0:
+                _hashed_password = generate_password_hash(_password)
+                print (_hashed_password)
+
+                cur.callproc('sp_createUser', (_email, _hashed_password))
+                data = cur.fetchall()
+                print (data)
+
+                if len(data) == 0:
+                    conn.commit()
+                    return json.dumps({'message':'User created successfully !'})
+                else:
+                    return json.dumps({'error':str(data[0])})
             else:
-                return json.dumps({'error':str(data[0])})
+                if not check_password_hash(data[0][1], _password):
+                    return json.dumps({'error':'Wrong password !'})
         else:
             return json.dumps({'html':'<span>Enter the required fields</span>'})
 
         session['user'] = _email
+        return json.dumps({'message':'Signed in successfully !'})
         # TODO: Write handling here
     except Exception as e:
         print ("Error:", e)
