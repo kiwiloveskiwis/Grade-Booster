@@ -15,17 +15,17 @@
       <div class="container">
 
          <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="#">Get S+</a>
+            <a class="navbar-brand" href="/">Get S+</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                <ul class="navbar-nav mr-auto">
                   <li class="nav-item active">
-                     <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                     <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
                   </li>
                   <li class="nav-item">
-                     <a class="nav-link" href="explore">Explore</a>
+                     <a class="nav-link" href="/explore">Explore</a>
                   </li>
                   <li class="nav-item dropdown">
                      <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -49,7 +49,12 @@
             </div>
          </nav>
          <!-- Main Paragraph  -->
+         {% if pageType != "index" %}
 
+         {% block body %}
+         {% endblock %}
+
+         {% else %}
          <div class="jumbotron">
             <h1 style="color:#17a2b8;">Grade Booster</h1>
             <p class="lead">Help student get A++! We display the grade distribution and relevant statistics for each course and instructor at UIUC. Features may include easy-comparisons of several courses you choose, fancy visualization, and discussion room. This saves your GPA. </p>
@@ -73,6 +78,7 @@
                <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
             </div>
          </div>
+         {% endif %}
          <div class="footer">
             <p>&copy; Database for BaselessData 2018</p>
          </div>

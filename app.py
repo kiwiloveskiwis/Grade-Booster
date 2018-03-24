@@ -38,7 +38,7 @@ def explore():
     cursor.execute("SELECT * from `Gene`")
     data = cursor.fetchone()
     print(data)
-    return main();
+    return render_template("explore.html", pageType='explore')
 
 @app.route('/signUp', methods=['POST'])
 def signUp():
@@ -74,7 +74,7 @@ def signUp():
 
 @app.route('/')
 def main():
-    return render_template('index.html')
+    return render_template('index.html', pageType='index')
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
