@@ -86,7 +86,7 @@ def signUp():
         else:
             return json.dumps({'html':'<span>Enter the required fields</span>'})
 
-        # session['user'] = user_data_object
+        session['user'] = _email
         # TODO: Write handling here
     except Exception as e:
         print ("Error:", e)
