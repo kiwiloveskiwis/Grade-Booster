@@ -31,6 +31,7 @@ def search():
     print("You just searched", search_q)
     return main();
 
+
 @app.route('/explore')
 def explore():
     cursor = mysql.connect().cursor()
@@ -39,6 +40,14 @@ def explore():
     data = cursor.fetchone()
     print(data)
     return render_template("explore.html", pageType='explore')
+
+@app.route('/profile', methods=['POST', 'GET'])
+def profile():
+    return render_template("index.html", pageType='account')
+
+@app.route('/fav_course', methods=['POST', 'GET'])
+def fav_course():
+    return render_template("index.html", pageType='account')
 
 @app.route('/signUp', methods=['POST'])
 def signUp():
