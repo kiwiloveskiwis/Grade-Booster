@@ -159,6 +159,7 @@ var $tab_en_edic = $("#" + tabId);  //Table to edit
             }
         });
         $tab_en_edic.find('tbody').append('<tr>'+htmlDat+'</tr>');
+        
         rowEdit($tab_en_edic.find('td'));
         // console.log($tab_en_edic.find('td'))
     } else {
