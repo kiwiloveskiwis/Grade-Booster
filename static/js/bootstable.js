@@ -41,6 +41,7 @@ Bootstable
     if (params.$addButton != null) {
         //Se proporcionó parámetro
         params.$addButton.click(function() {
+            // console.log($tabedi)
             rowAddNew($tabedi.attr("id"));
         });
     }

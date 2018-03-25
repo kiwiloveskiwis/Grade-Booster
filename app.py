@@ -1,6 +1,6 @@
 from flask import Flask, Response, render_template, json, request, redirect, abort, session, jsonify
 from flaskext.mysql import MySQL
-import json
+import json, sys
 from werkzeug import generate_password_hash, check_password_hash
 
 mysql = MySQL()
@@ -11,7 +11,6 @@ app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
 app.config['MYSQL_DATABASE_DB'] = 'baselessdata_db'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-app.config['SECRET_KEY'] = 'streamliner18 was here'
 mysql.init_app(app)
 
 
@@ -36,9 +35,9 @@ def search():
 def explore():
     cursor = mysql.connect().cursor()
     # TODO: replace below with random search from db
-    cursor.execute("SELECT * from `Gene`")
-    data = cursor.fetchone()
-    print(data)
+    # cursor.execute("SELECT * from `Gene`")
+    # data = cursor.fetchone()
+    # print(data)
     return render_template("explore.html", pageType='explore')
 
 @app.route('/profile', methods=['POST', 'GET'])
@@ -48,7 +47,7 @@ def profile():
 @app.route('/fav_course', methods=['POST', 'GET'])
 def fav_course():
     # TODO: replace below with actual db search
-    items = [['hey', 'how are you', '4.0']]
+    items = [['CS', '411', '4.0']]
     # cur = g.db.execute('select title, text from entries order by id desc')
     # items = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
     return render_template("fav_course.html", pageType='account', items=items)
@@ -90,4 +89,5 @@ def main():
     return render_template('index.html', pageType='index')
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    if(sys.platform=='linux'): app.run(host='0.0.0.0', port=80, use_reloader=True, threaded=True)
+    else: app.run(debug=True, port=5001)

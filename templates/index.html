@@ -15,6 +15,7 @@
       <link href="../static/stylesheets/css/boot.css" rel="stylesheet">
    </head>
    <body>
+
       {% set active_page = pageType | default('index') -%}
 
       <div class="container">
@@ -127,25 +128,45 @@
          </div> <!-- /container -->
          <!-- JavaScript 
          ================================================== -->
-         <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
-         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.js"></script>
+         <script type="text/javascript" src="https://code.jquery.com/jquery-latest.js"></script>
+         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.js"></script>
          <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> -->
          <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
 
          <script src="../static/js/bootstable.js"></script>
          <script type="text/javascript">
-            $('table').SetEditable();
+            $('table').SetEditable({
+              columnsEd: "0,1",
+              $addButton: $( "button" ),
+              onEdit: function($row) {
+                  var $cols = $row.find('td');
+                  var colLength = $cols.length;
+                  for (i = 0; i < colLength - 1; i++){ 
+                     // The last item is for buttons
+                     console.log($cols[i]);
+                  }
+              }, 
+              onDelete: function() {}, 
+              onBeforeDelete: function($row) {
+                  var $cols = $row.find('td');
+                  var colLength = $cols.length;
+                  for (i = 0; i < colLength - 1; i++){ 
+                     // TODO: delete data on db
+                     console.log($cols[i]);
+                  }
+              },
+              onAdd: function() {} 
+            });
          </script>
-
-
 
 
          <script type="text/javascript">
          $(function() {
              $("#autocomplete").autocomplete({
-                 source:function(request, response) {
-                     $.getJSON("{{url_for('autocomplete')}}",{
+                 source:function(request, response) { 
+                 // {{url_for('autocomplete')}} is /autocomplete
+                     $.getJSON("{{url_for('autocomplete')}}",{ 
                          q_course: request.term, 
                      }, function(data) {
                          response(data.matching_courses); 

@@ -3,7 +3,7 @@
 {% block body %}
  <body>
  	<div class="text-center">
-	<table class="table table-bordered">
+	<table class="table table-bordered" id='fav_table'>
     <thead>
       <tr>
         <th>Subject</th>
@@ -21,8 +21,9 @@
     {% endfor %}
     </tbody>
   </table>
+  <button class="btn btn-md btn-outline-info" role="button" >Add new</button>
   </div>
-
+  <p />
  </body>
 
 {% endblock %}
