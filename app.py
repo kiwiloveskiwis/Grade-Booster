@@ -7,10 +7,10 @@ mysql = MySQL()
 app = Flask(__name__)
 
 # MySQL configurations
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
-app.config['MYSQL_DATABASE_DB'] = 'baselessdata_db'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['MYSQL_DATABASE_USER'] = 'tianyu'
+app.config['MYSQL_DATABASE_PASSWORD'] = '515253'
+app.config['MYSQL_DATABASE_DB'] = 'project'
+app.config['MYSQL_DATABASE_HOST'] = '127.0.0.1'
 app.config['SECRET_KEY'] = 'streamliner18 was here'
 mysql.init_app(app)
 
@@ -80,6 +80,33 @@ def signUp():
         # TODO: Write handling here
     except Exception as e:
         abort(401)
+
+@app.route('/getall')
+def getall():
+    cursor = mysql.connect().cursor()
+    cursor.execute("SELECT subject, ROUND(AVG(overall_gpa), 2) as avg_gpa FROM course GROUP BY subject")
+    data = cursor.fetchall()
+
+    empList = []
+    for emp in data:
+        empDict = {
+            'subject': emp[0],
+            'avg_gpa': emp[1]
+        }
+        empList.append(empDict)
+    print("GOOD")
+
+    return json.dumps(empList)
+
+@app.route('/get_subject')
+def get_subject():
+    subject = request.args.get('subject', None)
+
+    cursor = mysql.connect().cursor()
+    cursor.execute("SELECT * FROM course WHERE subject= %s", subject)
+    course_list = cursor.fetchall()
+
+    return render_template('course.html', course_list=course_list)
 
 @app.route('/')
 def main():
