@@ -35,10 +35,18 @@
                   <li class="nav-item dropdown">
                      <a class="nav-link dropdown-toggle {% if 'account' == active_page %} active {% endif %}" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"  >
                         My Account
+                        {% if 'user' in session %}
+                        : {{ session['user'] }}
+                        {% endif %}
                      </a>
                      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        {% if 'user' in session %}
                         <a class="dropdown-item" href="/profile">Profile</a>
                         <a class="dropdown-item" href="/fav_course">Fav Courses</a>
+                        <a class="dropdown-item" href="/signOut">Sign Out</a>
+                        {% else %}
+                        <a class="dropdown-item" href="/signIn">Sign In</a>
+                        {% endif %}
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="#">Whatever</a>
                      </div>
