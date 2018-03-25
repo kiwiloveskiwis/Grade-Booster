@@ -7,12 +7,12 @@ mysql = MySQL()
 app = Flask(__name__)
 
 # MySQL configurations
-# app.config['MYSQL_DATABASE_USER'] = 'root'
-# app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
-# app.config['MYSQL_DATABASE_DB'] = 'baselessdata_db'
-app.config['MYSQL_DATABASE_USER'] = 'yuanyiz2_root'
-app.config['MYSQL_DATABASE_PASSWORD'] = '12345root'
-app.config['MYSQL_DATABASE_DB'] = 'yuanyiz2_baseless'
+app.config['MYSQL_DATABASE_USER'] = 'root'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
+app.config['MYSQL_DATABASE_DB'] = 'baselessdata_db'
+# app.config['MYSQL_DATABASE_USER'] = 'yuanyiz2_root'
+# app.config['MYSQL_DATABASE_PASSWORD'] = '12345root'
+# app.config['MYSQL_DATABASE_DB'] = 'yuanyiz2_baseless'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
@@ -73,7 +73,6 @@ def signUp():
             conn = mysql.connect()
             cur = conn.cursor()
             print (conn, cur)
-
             # check user existence first
             # q = "SELECT * FROM tbl_user WHERE email=\"{}\" AND password_hash=\"{}\";".format(_email, _hashed_password)
             q = "SELECT * FROM tbl_user WHERE email=\"{}\";".format(_email)
