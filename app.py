@@ -47,7 +47,11 @@ def profile():
 
 @app.route('/fav_course', methods=['POST', 'GET'])
 def fav_course():
-    return render_template("index.html", pageType='account')
+    # TODO: replace below with actual db search
+    items = [['hey', 'how are you', '4.0']]
+    # cur = g.db.execute('select title, text from entries order by id desc')
+    # items = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
+    return render_template("fav_course.html", pageType='account', items=items)
 
 @app.route('/signUp', methods=['POST'])
 def signUp():
