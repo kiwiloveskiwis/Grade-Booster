@@ -1,6 +1,6 @@
 from flask import Flask, Response, render_template, json, request, redirect, abort, session, jsonify
 from flaskext.mysql import MySQL
-import json
+import json, sys
 from werkzeug import generate_password_hash, check_password_hash
 
 mysql = MySQL()
@@ -14,7 +14,6 @@ app.config['MYSQL_DATABASE_USER'] = 'yuanyiz2_root'
 app.config['MYSQL_DATABASE_PASSWORD'] = '12345root'
 app.config['MYSQL_DATABASE_DB'] = 'yuanyiz2_baseless'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-app.config['SECRET_KEY'] = 'streamliner18 was here'
 mysql.init_app(app)
 
 
@@ -50,7 +49,11 @@ def profile():
 
 @app.route('/fav_course', methods=['POST', 'GET'])
 def fav_course():
-    return render_template("fav.html", pageType='account')
+    # TODO: replace below with actual db search
+    items = [['CS', '411', '4.0']]
+    # cur = g.db.execute('select title, text from entries order by id desc')
+    # items = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
+    return render_template("fav_course.html", pageType='account', items=items)
 
 @app.route('/signUp', methods=['POST'])
 def signUp():
@@ -121,4 +124,5 @@ def main():
     return render_template('index.html', pageType='index')
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    if(sys.platform=='linux'): app.run(host='0.0.0.0', port=80, use_reloader=True, threaded=True)
+    else: app.run(debug=True, port=5001)

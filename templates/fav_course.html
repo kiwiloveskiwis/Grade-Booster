@@ -1,0 +1,29 @@
+{% extends "index.html" %}
+{% set active_page = "fav_course" %}
+{% block body %}
+ <body>
+ 	<div class="text-center">
+	<table class="table table-bordered" id='fav_table'>
+    <thead>
+      <tr>
+        <th>Subject</th>
+        <th>Number</th>
+        <th>Avg GPA</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for item in items %}
+    <tr>
+        <td>{{item[0]}}</td>
+        <td>{{item[1]}}</td>
+        <td>{{item[2]}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <button class="btn btn-md btn-outline-info" role="button" >Add new</button>
+  </div>
+  <p />
+ </body>
+
+{% endblock %}
