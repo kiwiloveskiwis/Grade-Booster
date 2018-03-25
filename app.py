@@ -85,20 +85,18 @@ def signUp():
 
                 cur.callproc('sp_createUser', (_email, _hashed_password))
                 conn.commit()
-                flash('User created successfully!', 'success')
+                flash('Ohhh poor little guy that strays!', 'success')
 
             elif not check_password_hash(data[0][1], _password):
-                error = 'Wrong password!'
+                error = 'Seems like you forgot your password, so miserable.'
             else: 
-                flash('Logged in successfully.', 'success')
-        else: error = 'Enter the required fields!'
-        # Not used here: js already checked required fields
-        if (error): 
-            flash(error, 'error')
-            return redirect('/')
-        else:
-            session['user'] = _email.split("@")[0]
-            return redirect('/')
+                flash('Why come back? Nothing has been updated.', 'success')
+        else: error = 'FILL OUT THE FORMS!' # Not used here: js already checked required fields
+        
+        if (error): flash(error, 'error')
+        else:       session['user'] = _email.split("@")[0]
+
+        return redirect('/')
 
     except Exception as e:
         print ("Error:", e)

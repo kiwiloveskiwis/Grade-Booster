@@ -38,9 +38,8 @@
                      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="/profile">Profile</a>
                         <a class="dropdown-item" href="/fav_course">Fav Courses</a>
-                        <a class="dropdown-item" href="/signOut">Sign Out</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Whatever</a>
+                        <a class="dropdown-item" href="/signOut">Sign Out</a>
                      </div>
                   </li>
                   {% else %}
@@ -218,7 +217,7 @@
              $(".ui-helper-hidden-accessible").css({"position": "absolute", "left":"-999em"})
          })
 
-
+         // Let alert vanish after some time
          $(".alert").fadeTo(2000, 500).slideUp(500, function(){
             $(".alert").slideUp(500);
           });
