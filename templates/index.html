@@ -6,13 +6,13 @@
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
       <!-- Bootstrap CSS -->
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-<script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js" integrity="sha384-SlE991lGASHoBfWbelyBPLsUlwY1GwNDJo3jSJO04KZ33K2bwfV9YBauFfnzvynJ" crossorigin="anonymous"></script>
+      <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js" integrity="sha384-SlE991lGASHoBfWbelyBPLsUlwY1GwNDJo3jSJO04KZ33K2bwfV9YBauFfnzvynJ" crossorigin="anonymous"></script>
 <!--       <link rel="stylesheet"
       href="http://code.jquery.com/ui/1.9.0/themes/smoothness/jquery-ui.css" /> -->
       <title>Get S++: Your Grade Booster!</title>
       <!-- Bootstrap core CSS -->
       <!-- Custom styles for this template -->
-      <link href="../static/stylesheets/css/boot.css" rel="stylesheet">
+      <link href="../static/stylesheets/css/boot.css?<?php echo time(); ?>" rel="stylesheet">
    </head>
    <body>
 
@@ -126,6 +126,10 @@
          </div>
          <!-- End of Modal -->
          </div> <!-- /container -->
+
+
+
+
          <!-- JavaScript 
          ================================================== -->
          <script type="text/javascript" src="https://code.jquery.com/jquery-latest.js"></script>
@@ -156,7 +160,14 @@
                      console.log($cols[i]);
                   }
               },
-              onAdd: function() {} 
+              onAdd: function() {
+                   // var number = prompt("Please enter a number:");
+                   // document.write('<table border="1">');
+                   // for (i=1; i <= number; i++) {
+                   //     document.write('<tr><td>' + number + " x " + i + "</td><td>=</td><td>" + i*number + "</td></tr>");
+                   // };
+                   // document.write('</table>');
+              } 
             });
          </script>
 

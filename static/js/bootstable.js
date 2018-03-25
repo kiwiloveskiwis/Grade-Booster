@@ -159,6 +159,8 @@ var $tab_en_edic = $("#" + tabId);  //Table to edit
             }
         });
         $tab_en_edic.find('tbody').append('<tr>'+htmlDat+'</tr>');
+        rowEdit($tab_en_edic.find('td'));
+        // console.log($tab_en_edic.find('td'))
     } else {
         //Hay otras filas, podemos clonar la última fila, para copiar los botones
         var $ultFila = $tab_en_edic.find('tr:last');
@@ -167,12 +169,14 @@ var $tab_en_edic = $("#" + tabId);  //Table to edit
         var $cols = $ultFila.find('td');  //lee campos
         $cols.each(function() {
             if ($(this).attr('name')=='buttons') {
-                //Es columna de botones
+                // or do nothing?
+                rowEdit($(this));
             } else {
                 $(this).html('');  //limpia contenido
             }
         });
     }
+
 	params.onAdd();
 }
 function TableToCSV(tabId, separator) {  //Convierte tabla a CSV
