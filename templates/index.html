@@ -15,9 +15,7 @@
       <link href="../static/stylesheets/css/boot.css?<?php echo time(); ?>" rel="stylesheet">
    </head>
    <body>
-
       {% set active_page = pageType | default('index') -%}
-
       <div class="container">
          <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <a class="navbar-brand" href="/">Get S+</a>
@@ -30,27 +28,26 @@
                      <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
                   </li>
                   <li class="nav-item{% if 'explore' == active_page %} active {% endif %}" >
-                     <a class="nav-link"  href="/explore" {% if id == active_page %} class="active"{% endif %} >Explore</a>
+                     <a class="nav-link"  href="/explore">Explore</a>
                   </li>
+                  {% if 'user' in session %}
                   <li class="nav-item dropdown">
                      <a class="nav-link dropdown-toggle {% if 'account' == active_page %} active {% endif %}" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"  >
-                        My Account
-                        {% if 'user' in session %}
-                        : {{ session['user'] }}
-                        {% endif %}
+                        {{ session['user'] }}
                      </a>
                      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        {% if 'user' in session %}
                         <a class="dropdown-item" href="/profile">Profile</a>
                         <a class="dropdown-item" href="/fav_course">Fav Courses</a>
                         <a class="dropdown-item" href="/signOut">Sign Out</a>
-                        {% else %}
-                        <a class="dropdown-item" href="/signIn">Sign In</a>
-                        {% endif %}
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="#">Whatever</a>
                      </div>
                   </li>
+                  {% else %}
+                    <li class="nav-item" >
+                     <a class="nav-link" href="#signup" data-toggle="modal"  data-target="#signUpModal">Sign In<span class="sr-only">(current)</span></a>
+                    </li>
+                  {% endif %}
 <!--                   <li>
                     <a class="nav-link" href="#signUp" data-toggle="modal" role="button" data-target="#signUpModal">Login</a>
                   </li> -->
@@ -61,6 +58,24 @@
                </form>
             </div>
          </nav>
+
+         <!-- Show Msgs -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {%- if messages %}
+            {% for category, msg in messages %}
+              {% if category=='error' %}
+              <div class="alert alert-danger"><strong>Hmph. </strong>{{msg}} </div>
+              {% endif %}
+              {% if category=='success' %}
+              <div class="alert alert-success"><strong>Yo! </strong>{{msg}} </div>
+              {% endif %}
+            {% endfor %}
+          {% endif -%}
+        {% endwith %}
+
+
+
+
          <!-- Main Paragraph  -->
          {% if pageType != "index" %}
 
@@ -71,7 +86,9 @@
          <div class="jumbotron">
             <h1 style="color:#17a2b8;">Grade Booster</h1>
             <p class="lead">Help student get A++! We display the grade distribution and relevant statistics for each course and instructor at UIUC. Features may include easy-comparisons of several courses you choose, fancy visualization, and discussion room. This saves your GPA. </p>
+            {% if 'user' not in session %}
             <p><a class="btn btn-lg btn-outline-info" href="#signup" data-toggle="modal" role="button" data-target="#signUpModal">Sign up today</a></p>
+            {% endif %}
          </div>
          <div class="row marketing">
             <div class="col-lg-6">
@@ -148,6 +165,7 @@
 
          <script src="../static/js/bootstable.js"></script>
          <script type="text/javascript">
+         // editable table in /fav_course
             $('table').SetEditable({
               columnsEd: "0,1",
               $addButton: $( "button" ),
@@ -181,6 +199,7 @@
 
 
          <script type="text/javascript">
+         // Autocomplete for searches
          $(function() {
              $("#autocomplete").autocomplete({
                  source:function(request, response) { 
@@ -198,6 +217,11 @@
              });
              $(".ui-helper-hidden-accessible").css({"position": "absolute", "left":"-999em"})
          })
+
+
+         $(".alert").fadeTo(2000, 500).slideUp(500, function(){
+            $(".alert").slideUp(500);
+          });
          </script>
 
       </body>

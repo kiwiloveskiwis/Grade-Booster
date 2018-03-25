@@ -1,17 +1,15 @@
-mysql -u #ROOT -p
+CREATE DATABASE `baselessdata_db`;
 
-CREATE DATABASE #DB;
-
-CREATE TABLE #DB.tbl_user (
+CREATE TABLE `baselessdata_db`.tbl_user (
     email varchar(100),
-    password_hash varchr(256),
+    password_hash varchar(256),
     primary key(email)
     );
 
-USE #DB;
+USE `baselessdata_db`;
 
 DELIMITER $$
-CREATE DEFINER=`#ROOT`@`localhost` PROCEDURE `sp_createUser`(
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_createUser`(
     IN p_email VARCHAR(100),
     IN p_password VARCHAR(256)
 )
