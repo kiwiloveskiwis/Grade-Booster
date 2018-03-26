@@ -5,24 +5,27 @@ from werkzeug import generate_password_hash, check_password_hash
 from flask_sslify import SSLify
 import re
 
+
 mysql = MySQL()
 app = Flask(__name__)
 sslify = SSLify(app)
 ac_cache = None
 
 # MySQL configurations
-if(sys.platform == 'linux' or sys.platform == 'darwin'):
+if "yuanyiz2" in __file__:
+    app.config['MYSQL_DATABASE_USER'] = 'yuanyiz2_root'
+    app.config['MYSQL_DATABASE_PASSWORD'] = '12345root'
+    app.config['MYSQL_DATABASE_DB'] = 'yuanyiz2_baseless'
+else:
+# if(sys.platform == 'linux' or sys.platform == 'darwin'):
     app.config['MYSQL_DATABASE_USER'] = 'root'
     app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
     app.config['MYSQL_DATABASE_DB'] = 'baselessdata_db'
-    app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-    app.config['SECRET_KEY'] = 'whatever'
-else:
-    # app.config['MYSQL_DATABASE_USER'] = 'yuanyiz2_root'
-    # app.config['MYSQL_DATABASE_PASSWORD'] = '12345root'
-    # app.config['MYSQL_DATABASE_DB'] = 'yuanyiz2_baseless'
-    pass
+    # sslify = SSLify(app)
+    SSLify(app)
 
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['SECRET_KEY'] = 'whatever'
 
 mysql.init_app(app)
 
@@ -30,7 +33,7 @@ mysql.init_app(app)
 def autocomplete():
     global ac_cache
     search = request.args.get('q_course').upper()
-    regex_ = re.compile('.*' + '.*'.join([i for i in search]) + '.*')
+    regex_ = re.compile('.*' + '\s*'.join([i for i in search]) + '.*')
 
     if ac_cache == None: 
         conn = mysql.connect()

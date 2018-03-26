@@ -1,9 +1,18 @@
 CREATE DATABASE `baselessdata_db`;
 
+<<<<<<< HEAD:sql_cmds.txt
+CREATE DATABASE #DB;
+
+CREATE TABLE #DB.tbl_user (
+    email VARCHAR(100),
+    password_hash VARCHAR(256),
+    PRIMARY KEY(email)
+=======
 CREATE TABLE `baselessdata_db`.tbl_user (
     email varchar(100),
     password_hash varchar(256),
     primary key(email)
+>>>>>>> refs/remotes/origin/master:sql_related/signin_cmds.txt
     );
 
 USE `baselessdata_db`;
