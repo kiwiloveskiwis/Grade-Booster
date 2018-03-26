@@ -3,9 +3,9 @@ mysql -u #ROOT -p
 CREATE DATABASE #DB;
 
 CREATE TABLE #DB.tbl_user (
-    email varchar(100),
-    password_hash varchr(256),
-    primary key(email)
+    email VARCHAR(100),
+    password_hash VARCHAR(256),
+    PRIMARY KEY(email)
     );
 
 USE #DB;
