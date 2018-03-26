@@ -12,6 +12,7 @@ sslify = SSLify(app)
 ac_cache = None
 
 # MySQL configurations
+<<<<<<< HEAD
 if "yuanyiz2" in __file__:
     app.config['MYSQL_DATABASE_USER'] = 'yuanyiz2_root'
     app.config['MYSQL_DATABASE_PASSWORD'] = '12345root'
@@ -26,6 +27,8 @@ else:
 
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['SECRET_KEY'] = 'whatever'
+
+=======
 
 mysql.init_app(app)
 
@@ -135,6 +138,32 @@ def signOut():
     session.pop('user', None)
     return redirect('/')
     # return render_template('index.html', pageType='index')
+
+@app.route('/getall')
+def getall():
+    cursor = mysql.connect().cursor()
+    cursor.execute("SELECT subject, ROUND(AVG(overall_gpa), 2) as avg_gpa FROM course GROUP BY subject")
+    data = cursor.fetchall()
+
+    empList = []
+    for emp in data:
+        empDict = {
+            'subject': emp[0],
+            'avg_gpa': emp[1]
+        }
+        empList.append(empDict)
+
+    return json.dumps(empList)
+
+@app.route('/get_subject')
+def get_subject():
+    subject = request.args.get('subject', None)
+
+    cursor = mysql.connect().cursor()
+    cursor.execute("SELECT * FROM course WHERE subject= %s", subject)
+    course_list = cursor.fetchall()
+
+    return render_template('course.html', course_list=course_list)
 
 @app.route('/')
 def main():
