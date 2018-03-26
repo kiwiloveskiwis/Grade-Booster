@@ -8,7 +8,7 @@ import re
 
 mysql = MySQL()
 app = Flask(__name__)
-sslify = SSLify(app)
+# sslify = SSLify(app)
 ac_cache = None
 
 # MySQL configurations
@@ -21,8 +21,7 @@ else:
     app.config['MYSQL_DATABASE_USER'] = 'root'
     app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
     app.config['MYSQL_DATABASE_DB'] = 'baselessdata_db'
-    # sslify = SSLify(app)
-    SSLify(app)
+    sslify = SSLify(app)
 
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['SECRET_KEY'] = 'whatever'
