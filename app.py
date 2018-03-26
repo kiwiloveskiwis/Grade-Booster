@@ -2,9 +2,11 @@ from flask import Flask, Response, render_template, json, request, redirect, abo
 from flaskext.mysql import MySQL
 import json, sys
 from werkzeug import generate_password_hash, check_password_hash
+from flask_sslify import SSLify
 
 mysql = MySQL()
 app = Flask(__name__)
+sslify = SSLify(app)
 
 # MySQL configurations
 if(sys.platform == 'linux' or sys.platform == 'darwin'):
