@@ -5,6 +5,7 @@ from werkzeug import generate_password_hash, check_password_hash
 from flask_sslify import SSLify
 import re
 
+import query
 
 mysql = MySQL()
 app = Flask(__name__)
@@ -101,17 +102,16 @@ def fav_course():
 def insert_table(course_id):
     replace_id = request.args.get('replace', default=None)
     cursor = mysql.get_db().cursor()
-    if(replace == None):
-        cursor.execute(" ") # insert
+    if(not replace_id): # insert
+        query.insert_favorite(email=session['user'], course_id=course_id)
     else:
-        cursor.execute(" ") # update
+        query.update_favorite(email=session['user'], old_course_id=replace_id, new_course_id=course_id) # update
         
     return redirect('/fav_course')
 
 @app.route('/fav_course/del/<course_id>', )
 def delete_table(course_id):
-    cursor = mysql.get_db().cursor()
-    cursor.execute(" ")
+    query.remove_favorite(email=session['user'], course_id=course_id)
     return redirect('/fav_course')
 
 
@@ -147,8 +147,9 @@ def signUp():
         else: error = 'FILL OUT THE FORMS!' # Not used here: js already checked required fields
         
         if (error): flash(error, 'error')
-        else:       session['user'] = _email.split("@")[0]
-
+        else:       
+            session['user'] = _email
+            session['uname'] = _email.split("@")[0]
         return redirect('/')
 
     except Exception as e:
