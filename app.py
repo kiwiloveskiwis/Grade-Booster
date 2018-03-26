@@ -39,7 +39,7 @@ def get_data_from_sql(q):
     conn.close(); cur.close()
     return data
 
-@app.route('/autocomplete', methods=['GET'])
+@app.route('/autocomplete', methods=['GET', 'POST'])
 def autocomplete():
     global ac_cache
     search = request.args.get('q_course').upper()
@@ -54,9 +54,9 @@ def autocomplete():
     results = [i for i in results][:5]
     return jsonify(matching_courses=results)
 
-@app.route('/search', methods=['POST', 'GET'])
+@app.route('/search', methods=['GET'])
 def search():
-    search_q = request.form['q'].upper()
+    search_q = request.args['q'].upper()
     parts = re.split('(\d.*)', search_q)
     try:
         sbj, number = parts[0].strip(), parts[1].strip()
@@ -77,6 +77,8 @@ def explore():
 def profile():
     return render_template("profile.html", pageType='account')
 
+
+####### Fav_course #######
 @app.route('/fav_course', methods=['POST', 'GET'])
 def fav_course():
     # TODO: replace below with actual db search
@@ -84,6 +86,26 @@ def fav_course():
     # cur = g.db.execute('select title, text from entries order by id desc')
     # items = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
     return render_template("fav_course.html", pageType='account', items=items)
+
+@app.route('/fav_course/add/<course_id>', )
+def insert_table(course_id):
+    replace_id = request.args.get('replace', default=None)
+    cursor = mysql.get_db().cursor()
+    if(replace == None):
+        cursor.execute(" ") # insert
+    else:
+        cursor.execute(" ") # update
+        
+    return redirect('/fav_course')
+
+@app.route('/fav_course/del/<course_id>', )
+def delete_table(course_id):
+    cursor = mysql.get_db().cursor()
+    cursor.execute(" ")
+    return redirect('/fav_course')
+
+
+###############################
 
 @app.route('/signUp', methods=['POST'])
 def signUp():
@@ -94,14 +116,11 @@ def signUp():
     try:
         # validate the received values
         if _email and _password:
-            conn = mysql.connect()
-            cur = conn.cursor()
+            cur = mysql.get_db().cursor()
             # check user existence first
             q = "SELECT * FROM tbl_user WHERE email=\"{}\";".format(_email)
-            print (q)
             cur.execute(q)
             data = cur.fetchall()
-            print (data)
 
             if len(data) == 0: # user not exist: consider as sign up
                 _hashed_password = generate_password_hash(_password)
@@ -125,9 +144,6 @@ def signUp():
     except Exception as e:
         print ("Error:", e)
         abort(401)
-    finally:
-        if cur is not None: cur.close() 
-        if conn is not None: conn.close()
 
 @app.route('/signOut')
 def signOut():
@@ -147,7 +163,7 @@ def getall():
     for emp in data:
         empDict = {
             'subject': emp[0],
-            'avg_gpa': emp[1]
+            'avg_gpa': float(emp[1])
         }
         empList.append(empDict)
 

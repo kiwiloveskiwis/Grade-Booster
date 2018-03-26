@@ -57,7 +57,7 @@
                     <a class="nav-link" href="#signUp" data-toggle="modal" role="button" data-target="#signUpModal">Login</a>
                   </li> -->
                </ul>
-               <form class="form-inline my-2 my-lg-0"  method="post" action='/search'>
+               <form class="form-inline my-2 my-lg-0"  method="get" action='/search'>
                   <input class="form-control mr-sm-2" name="q" type="search" placeholder="Search" aria-label="Search" id="autocomplete">
                   <button class="btn btn-outline-info my-2 my-sm-0" type="submit" >Search</button>
                </form>
@@ -239,7 +239,6 @@
          <script type="text/javascript">
          <script type="text/javascript">
          // editable table in /fav_course
-            console.log($('.table-editable'))
             $('.table-editable').SetEditable({
               columnsEd: "0,1",
               $addButton: $( "button" ),
@@ -276,7 +275,7 @@
          // Autocomplete for searches
          $(function() {
              $("#autocomplete").autocomplete({
-                 source:function(request, response) { 
+                 source: function(request, response) { 
                  // {{url_for('autocomplete')}} is /autocomplete
                      $.getJSON("{{url_for('autocomplete')}}",{ 
                          q_course: request.term, 
