@@ -6,21 +6,22 @@ from flask_sslify import SSLify
 
 mysql = MySQL()
 app = Flask(__name__)
-sslify = SSLify(app)
 
 # MySQL configurations
-if(sys.platform == 'linux' or sys.platform == 'darwin'):
+if "yuanyiz2" in __file__:
+    app.config['MYSQL_DATABASE_USER'] = 'yuanyiz2_root'
+    app.config['MYSQL_DATABASE_PASSWORD'] = '12345root'
+    app.config['MYSQL_DATABASE_DB'] = 'yuanyiz2_baseless'
+else:
+# if(sys.platform == 'linux' or sys.platform == 'darwin'):
     app.config['MYSQL_DATABASE_USER'] = 'root'
     app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
     app.config['MYSQL_DATABASE_DB'] = 'baselessdata_db'
-    app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-    app.config['SECRET_KEY'] = 'whatever'
-else:
-    # app.config['MYSQL_DATABASE_USER'] = 'yuanyiz2_root'
-    # app.config['MYSQL_DATABASE_PASSWORD'] = '12345root'
-    # app.config['MYSQL_DATABASE_DB'] = 'yuanyiz2_baseless'
-    pass
+    # sslify = SSLify(app)
+    SSLify(app)
 
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['SECRET_KEY'] = 'whatever'
 
 mysql.init_app(app)
 
