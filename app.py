@@ -1,85 +1,145 @@
-from flask import Flask, Response, render_template, json, request, redirect, abort, session, jsonify
+from flask import Flask, Response, render_template, json, request, redirect, abort, session, jsonify, flash
 from flaskext.mysql import MySQL
-import json
+import json, sys
 from werkzeug import generate_password_hash, check_password_hash
+from flask_sslify import SSLify
+import re
+
 
 mysql = MySQL()
 app = Flask(__name__)
+# sslify = SSLify(app)
+ac_cache = None
 
-# MySQL configurations
+# # MySQL configurations
+# if "yuanyiz2" in __file__:
+#     app.config['MYSQL_DATABASE_USER'] = 'yuanyiz2_root'
+#     app.config['MYSQL_DATABASE_PASSWORD'] = '12345root'
+#     app.config['MYSQL_DATABASE_DB'] = 'yuanyiz2_baseless'
+# else:
+# # if(sys.platform == 'linux' or sys.platform == 'darwin'):
+#     app.config['MYSQL_DATABASE_USER'] = 'root'
+#     app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
+#     app.config['MYSQL_DATABASE_DB'] = 'baselessdata_db'
+#     # sslify = SSLify(app)
+#     SSLify(app)
+
+
 app.config['MYSQL_DATABASE_USER'] = 'tianyu'
 app.config['MYSQL_DATABASE_PASSWORD'] = '515253'
 app.config['MYSQL_DATABASE_DB'] = 'project'
-app.config['MYSQL_DATABASE_HOST'] = '127.0.0.1'
-app.config['SECRET_KEY'] = 'streamliner18 was here'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['SECRET_KEY'] = 'whatever'
+
 mysql.init_app(app)
 
 
+def get_data_from_sql(q):
+    conn = mysql.connect(); cur = conn.cursor()
+    if(type(q) == str): cur.execute(q)
+    else: cur.execute(q[0], q[1:])
+
+    data = cur.fetchall()
+    conn.close(); cur.close()
+    return data
+
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
-    search = request.args.get('q_course')
-    print(search)
-    # query = db_session.query(Course.title).filter(Course.title.like('%' + str(search) + '%'))
-    # TODO: replace below with above
-    results = ['CS411', 'CS543'] # just to check the autocompletion works
+    global ac_cache
+    search = request.args.get('q_course').upper()
+    regex_ = re.compile('.*' + '\s*'.join([i for i in search]) + '.*')
+
+    if ac_cache == None: 
+        q = "SELECT DISTINCT subject, number FROM `raw`"
+        all_data = get_data_from_sql(q)
+        ac_cache = [d[0] + ' ' + str(d[1]) for d in all_data]
+
+    results = filter(regex_.match, ac_cache)
+    results = [i for i in results][:5]
     return jsonify(matching_courses=results)
 
 @app.route('/search', methods=['POST', 'GET'])
 def search():
-    search_q = request.form['q']
-    # TODO: replace below with search from db
-    print("You just searched", search_q)
-    return main();
-
+    search_q = request.form['q'].upper()
+    parts = re.split('(\d.*)', search_q)
+    try:
+        sbj, number = parts[0].strip(), parts[1].strip()
+        print("You just searched", sbj, number)
+        q = ["SELECT * FROM `raw` WHERE subject = (%s) AND number = (%s)", sbj, number]
+        print(q)
+        course_info = get_data_from_sql(q)
+        print(course_info)
+    except:
+        course_info=None
+    return render_template("course_info.html", pageType='other', course_info=course_info)
 
 @app.route('/explore')
 def explore():
-    cursor = mysql.connect().cursor()
-    # TODO: replace below with random search from db
-    cursor.execute("SELECT * from `Gene`")
-    data = cursor.fetchone()
-    print(data)
     return render_template("explore.html", pageType='explore')
 
 @app.route('/profile', methods=['POST', 'GET'])
 def profile():
-    return render_template("index.html", pageType='account')
+    return render_template("profile.html", pageType='account')
 
 @app.route('/fav_course', methods=['POST', 'GET'])
 def fav_course():
-    return render_template("index.html", pageType='account')
+    # TODO: replace below with actual db search
+    items = [['CS', '411', '4.0']]
+    # cur = g.db.execute('select title, text from entries order by id desc')
+    # items = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
+    return render_template("fav_course.html", pageType='account', items=items)
 
 @app.route('/signUp', methods=['POST'])
 def signUp():
     _email = request.form['email']
     _password = request.form['password']
-    print(_email, _password)
+    cur, conn = None, None
+    error = None
     try:
-        # TODO: Convert this query to python
-        # SQL: INSERT INTO Users VALUES ({_email}, {_password}, {_name})
+        # validate the received values
+        if _email and _password:
+            conn = mysql.connect()
+            cur = conn.cursor()
+            # check user existence first
+            q = "SELECT * FROM tbl_user WHERE email=\"{}\";".format(_email)
+            print (q)
+            cur.execute(q)
+            data = cur.fetchall()
+            print (data)
+
+            if len(data) == 0: # user not exist: consider as sign up
+                _hashed_password = generate_password_hash(_password)
+                # print (_hashed_password)
+
+                cur.callproc('sp_createUser', (_email, _hashed_password))
+                conn.commit()
+                flash('Ohhh poor little guy that strays!', 'success')
+
+            elif not check_password_hash(data[0][1], _password):
+                error = 'Seems like you forgot your password, so miserable.'
+            else: 
+                flash('Why come back? Nothing has been updated.', 'success')
+        else: error = 'FILL OUT THE FORMS!' # Not used here: js already checked required fields
         
-        # # validate the received values
-        # if _name and _email and _password:
+        if (error): flash(error, 'error')
+        else:       session['user'] = _email.split("@")[0]
 
-        #     # All Good, let's call MySQL
+        return redirect('/')
 
-        #     conn = mysql.connect()
-        #     _hashed_password = generate_password_hash(_password)
-        #     cur = mysql.connection.cursor()
-        #     cur.callproc('sp_createUser', (name, email, hashed_password))
-        #     data = cur.fetchall()
-
-        #     if len(data) is 0:
-        #         conn.commit()
-        #         return json.dumps({'message':'User created successfully !'})
-        #     else:
-        #         return json.dumps({'error':str(data[0])})
-        # else:
-        #     return json.dumps({'html':'<span>Enter the required fields</span>'})
-        session['user'] = user_data_object
-        # TODO: Write handling here
     except Exception as e:
+        print ("Error:", e)
         abort(401)
+    finally:
+        if cur is not None: cur.close() 
+        if conn is not None: conn.close()
+
+@app.route('/signOut')
+def signOut():
+    # if 'user' not in session:
+    #     return redirect(url_for('signin'))
+    session.pop('user', None)
+    return redirect('/')
+    # return render_template('index.html', pageType='index')
 
 @app.route('/getall')
 def getall():
@@ -94,7 +154,6 @@ def getall():
             'avg_gpa': emp[1]
         }
         empList.append(empDict)
-    print("GOOD")
 
     return json.dumps(empList)
 
@@ -113,4 +172,6 @@ def main():
     return render_template('index.html', pageType='index')
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+
+    if(sys.platform=='linux'): app.run(host='0.0.0.0', port=80, use_reloader=True, threaded=True)
+    else: app.run(debug=True, port=5001)

@@ -1,0 +1,30 @@
+{% extends "index.html" %}
+{% block body %}
+ <body>
+ 	<div class="text-center">
+	{% if course_info %}
+ 	<h1> {{course_info[0][3]}} </h1>
+ 	<table class="table table-bordered">
+    <thead>
+      <tr>
+      	{% for title in ['subject', 'number', 'crn', 'title', 'ap', 'a', 'am', 'bp', 'b', 'bm', 'cp', 'c', 'cm', 'dp', 'd', 'dm', 'f', 'w', 'instructor', 'semester'][4:] %}
+        <th>{{title}}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+    {% for items in course_info %}
+    <tr>
+    	{% for it in items[4:] %}
+        <td>{{it}}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+	</div>
+	<p />
+ </body>
+
+{% endblock %}

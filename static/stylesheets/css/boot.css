@@ -104,7 +104,7 @@ body {
   padding: 4px 0;
   margin: 2px 0 0 0;
   list-style: none;
-  background-color: rgba(255, 255, 255, 0);
+  background-color: rgba(255, 255, 255, 0); 
   border-color: rgba(0, 0, 0, 0);
   border-style: solid;
   border-right-width: 10px;
@@ -118,7 +118,6 @@ body {
   -webkit-background-clip: padding-box;
   -moz-background-clip: padding;
   background-clip: padding-box;
-
 /*  .ui-menu-item > a.ui-corner-all {
     display: block;
     padding: 3px 15px;
@@ -140,11 +139,12 @@ body {
   }*/
 }
 
+
 li.ui-state-focus{
       text-decoration: none;
       text-decoration-line: underline;
       text-decoration-style: wavy;
-/*       background-color: #0088cc73; */
+      /*background-color: #0088cc73; */
       border-radius: 0px;
       -webkit-border-radius: 0px;
       -moz-border-radius: 0px;
