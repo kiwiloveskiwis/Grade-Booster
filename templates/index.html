@@ -12,12 +12,13 @@
       <title>Get S++: Your Grade Booster!</title>
       <!-- Bootstrap core CSS -->
       <!-- Custom styles for this template -->
-<<<<<<< HEAD
+
       <link href="../static/stylesheets/css/boot.css?<?php echo time(); ?>" rel="stylesheet">
-=======
       <link href="../static/stylesheets/css/boot.css" rel="stylesheet">
       <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js"></script>
->>>>>>> viewCourse
+
+      <link href="../static/stylesheets/css/boot.css?<?php echo time(); ?>" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js"></script>
    </head>
    <body>
       {% set active_page = pageType | default('index') -%}
@@ -200,6 +201,42 @@
 
 
          <script src="../static/js/bootstable.js"></script>
+         <script type="text/javascript">
+         // editable table in /fav_course
+            console.log($('.table-editable'))
+            $('.table-editable').SetEditable({
+              columnsEd: "0,1",
+              $addButton: $( "button" ),
+              onEdit: function($row) {
+                  var $cols = $row.find('td');
+                  var colLength = $cols.length;
+                  for (i = 0; i < colLength - 1; i++){ 
+                     // The last item is for buttons
+                     console.log($cols[i]);
+                  }
+              }, 
+              onDelete: function() {}, 
+              onBeforeDelete: function($row) {
+                  var $cols = $row.find('td');
+                  var colLength = $cols.length;
+                  for (i = 0; i < colLength - 1; i++){ 
+                     // TODO: delete data on db
+                     console.log($cols[i]);
+                  }
+              },
+              onAdd: function() {
+                   // var number = prompt("Please enter a number:");
+                   // document.write('<table border="1">');
+                   // for (i=1; i <= number; i++) {
+                   //     document.write('<tr><td>' + number + " x " + i + "</td><td>=</td><td>" + i*number + "</td></tr>");
+                   // };
+                   // document.write('</table>');
+              } 
+            });
+         </script>
+
+
+         <script type="text/javascript">
          <script type="text/javascript">
          // editable table in /fav_course
             console.log($('.table-editable'))
