@@ -114,6 +114,7 @@ def signOut():
     # if 'user' not in session:
     #     return redirect(url_for('signin'))
     session.pop('user', None)
+    flash('Wish the force be with you!', 'success')
     return redirect('/')
     # return render_template('index.html', pageType='index')
 
