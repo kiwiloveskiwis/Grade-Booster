@@ -2,9 +2,13 @@ from flask import Flask, Response, render_template, json, request, redirect, abo
 from flaskext.mysql import MySQL
 import json, sys
 from werkzeug import generate_password_hash, check_password_hash
+from flask_sslify import SSLify
+import re
 
 mysql = MySQL()
 app = Flask(__name__)
+sslify = SSLify(app)
+ac_cache = None
 
 # MySQL configurations
 if(sys.platform == 'linux' or sys.platform == 'darwin'):
@@ -22,14 +26,22 @@ else:
 
 mysql.init_app(app)
 
-
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
-    search = request.args.get('q_course')
-    print(search)
-    # query = db_session.query(Course.title).filter(Course.title.like('%' + str(search) + '%'))
-    # TODO: replace below with above
-    results = ['CS 411', 'CS 543'] # just to check the autocompletion works
+    global ac_cache
+    search = request.args.get('q_course').upper()
+    regex_ = re.compile('.*' + '.*'.join([i for i in search]) + '.*')
+
+    if ac_cache == None: 
+        conn = mysql.connect()
+        cur = conn.cursor()
+        q = "SELECT DISTINCT subject, number FROM `raw`"
+        cur.execute(q)
+        all_data = cur.fetchall()
+        ac_cache = [d[0] + ' ' + str(d[1]) for d in all_data]
+
+    results = filter(regex_.match, ac_cache)
+    results = [i for i in results][:5]
     return jsonify(matching_courses=results)
 
 @app.route('/search', methods=['POST', 'GET'])
@@ -42,11 +54,6 @@ def search():
 
 @app.route('/explore')
 def explore():
-    # cursor = mysql.connect().cursor()
-    # TODO: replace below with random search from db
-    # cursor.execute("SELECT * from `Gene`")
-    # data = cursor.fetchone()
-    # print(data)
     return render_template("explore.html", pageType='explore')
 
 @app.route('/profile', methods=['POST', 'GET'])
@@ -102,7 +109,6 @@ def signUp():
         print ("Error:", e)
         abort(401)
     finally:
-
         if cur is not None: cur.close() 
         if conn is not None: conn.close()
 
@@ -119,5 +125,6 @@ def main():
     return render_template('index.html', pageType='index')
 
 if __name__ == "__main__":
+
     if(sys.platform=='linux'): app.run(host='0.0.0.0', port=80, use_reloader=True, threaded=True)
     else: app.run(debug=True, port=5001)
