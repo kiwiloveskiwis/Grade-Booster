@@ -8,7 +8,6 @@ import re
 
 mysql = MySQL()
 app = Flask(__name__)
-sslify = SSLify(app)
 ac_cache = None
 
 # MySQL configurations
@@ -21,8 +20,7 @@ else:
     app.config['MYSQL_DATABASE_USER'] = 'root'
     app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
     app.config['MYSQL_DATABASE_DB'] = 'baselessdata_db'
-    # sslify = SSLify(app)
-    SSLify(app)
+    sslify = SSLify(app)
 
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['SECRET_KEY'] = 'whatever'
@@ -76,6 +74,18 @@ def explore():
 @app.route('/profile', methods=['POST', 'GET'])
 def profile():
     return render_template("profile.html", pageType='account')
+
+
+@app.route('/tableview')
+def tableview():
+    # Subject, Number, Title, GPA,
+    items = [['CS', '411', 'Database', '4.0'],
+             ['CS', '412', 'Introduction to Data Mining', '4.0']]
+    is_fav = [False,
+              True]
+    # is_fav = ['False',
+    #           'True']
+    return render_template("tableview.html", pageType='tableview', items=items, is_fav=is_fav)
 
 
 ####### Fav_course #######
