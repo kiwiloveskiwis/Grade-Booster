@@ -58,15 +58,16 @@ def autocomplete():
 def search():
     search_q = request.form['q'].upper()
     parts = re.split('(\d.*)', search_q)
-    sbj, number = parts[0].strip(), parts[1].strip()
-    print("You just searched", sbj, number)
-    q = ["SELECT * FROM `raw` WHERE subject = (%s) AND number = (%s)", sbj, number]
-    print(q)
-    course_info = get_data_from_sql(q)
-    print(course_info)
-
+    try:
+        sbj, number = parts[0].strip(), parts[1].strip()
+        print("You just searched", sbj, number)
+        q = ["SELECT * FROM `raw` WHERE subject = (%s) AND number = (%s)", sbj, number]
+        print(q)
+        course_info = get_data_from_sql(q)
+        print(course_info)
+    except:
+        course_info=None
     return render_template("course_info.html", pageType='other', course_info=course_info)
-
 
 @app.route('/explore')
 def explore():
