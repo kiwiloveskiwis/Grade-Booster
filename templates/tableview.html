@@ -38,12 +38,12 @@
           <!-- <button id="bEdit" type="button" class="btn btn-sm btn-default" onclick="rowEdit(this);"> -->
           {% if is_fav[loop.index-1] %}
           <button id="bAddFav" type="button" class="btn btn-sm btn-default"
-          onclick="location.href='/fav/delete/{{item[0]}}{{item[1]}}';">
+          onclick="location.href='/fav_course/del/{{item[0]}}{{item[1]}}';">
           <span class="fas fa-star" style='color:#FFC300'> </span>
           </button>
           {% else %}
           <button id="bAddFav" type="button" class="btn btn-sm btn-default"
-          onclick="location.href='/fav/add/{{item[0]}}{{item[1]}}';">
+          onclick="location.href='/fav_course/add/{{item[0]}}{{item[1]}}';">
           <span class="far fa-star"> </span>
           </button>
           {% endif %}
