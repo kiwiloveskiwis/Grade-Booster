@@ -12,7 +12,6 @@ sslify = SSLify(app)
 ac_cache = None
 
 # MySQL configurations
-<<<<<<< HEAD
 if "yuanyiz2" in __file__:
     app.config['MYSQL_DATABASE_USER'] = 'yuanyiz2_root'
     app.config['MYSQL_DATABASE_PASSWORD'] = '12345root'
@@ -27,8 +26,6 @@ else:
 
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['SECRET_KEY'] = 'whatever'
-
-=======
 
 mysql.init_app(app)
 
