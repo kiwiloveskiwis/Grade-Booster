@@ -165,7 +165,8 @@
          <script src="../static/js/bootstable.js"></script>
          <script type="text/javascript">
          // editable table in /fav_course
-            $('table').SetEditable({
+            console.log($('.table-editable'))
+            $('.table-editable').SetEditable({
               columnsEd: "0,1",
               $addButton: $( "button" ),
               onEdit: function($row) {

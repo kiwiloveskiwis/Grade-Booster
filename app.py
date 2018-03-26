@@ -29,6 +29,16 @@ app.config['SECRET_KEY'] = 'whatever'
 
 mysql.init_app(app)
 
+
+def get_data_from_sql(q):
+    conn = mysql.connect(); cur = conn.cursor()
+    if(type(q) == str): cur.execute(q)
+    else: cur.execute(q[0], q[1:])
+
+    data = cur.fetchall()
+    conn.close(); cur.close()
+    return data
+
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
     global ac_cache
@@ -36,11 +46,8 @@ def autocomplete():
     regex_ = re.compile('.*' + '\s*'.join([i for i in search]) + '.*')
 
     if ac_cache == None: 
-        conn = mysql.connect()
-        cur = conn.cursor()
         q = "SELECT DISTINCT subject, number FROM `raw`"
-        cur.execute(q)
-        all_data = cur.fetchall()
+        all_data = get_data_from_sql(q)
         ac_cache = [d[0] + ' ' + str(d[1]) for d in all_data]
 
     results = filter(regex_.match, ac_cache)
@@ -49,10 +56,16 @@ def autocomplete():
 
 @app.route('/search', methods=['POST', 'GET'])
 def search():
-    search_q = request.form['q']
-    # TODO: replace below with search from db
-    print("You just searched", search_q)
-    return main();
+    search_q = request.form['q'].upper()
+    parts = re.split('(\d.*)', search_q)
+    sbj, number = parts[0].strip(), parts[1].strip()
+    print("You just searched", sbj, number)
+    q = ["SELECT * FROM `raw` WHERE subject = (%s) AND number = (%s)", sbj, number]
+    print(q)
+    course_info = get_data_from_sql(q)
+    print(course_info)
+
+    return render_template("course_info.html", pageType='other', course_info=course_info)
 
 
 @app.route('/explore')
