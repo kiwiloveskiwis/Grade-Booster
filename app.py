@@ -3,9 +3,13 @@ from flaskext.mysql import MySQL
 import json, sys
 from werkzeug import generate_password_hash, check_password_hash
 from flask_sslify import SSLify
+import re
+
 
 mysql = MySQL()
 app = Flask(__name__)
+sslify = SSLify(app)
+ac_cache = None
 
 # MySQL configurations
 if "yuanyiz2" in __file__:
@@ -26,30 +30,47 @@ app.config['SECRET_KEY'] = 'whatever'
 mysql.init_app(app)
 
 
+def get_data_from_sql(q):
+    conn = mysql.connect(); cur = conn.cursor()
+    if(type(q) == str): cur.execute(q)
+    else: cur.execute(q[0], q[1:])
+
+    data = cur.fetchall()
+    conn.close(); cur.close()
+    return data
+
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
-    search = request.args.get('q_course')
-    print(search)
-    # query = db_session.query(Course.title).filter(Course.title.like('%' + str(search) + '%'))
-    # TODO: replace below with above
-    results = ['CS 411', 'CS 543'] # just to check the autocompletion works
+    global ac_cache
+    search = request.args.get('q_course').upper()
+    regex_ = re.compile('.*' + '\s*'.join([i for i in search]) + '.*')
+
+    if ac_cache == None: 
+        q = "SELECT DISTINCT subject, number FROM `raw`"
+        all_data = get_data_from_sql(q)
+        ac_cache = [d[0] + ' ' + str(d[1]) for d in all_data]
+
+    results = filter(regex_.match, ac_cache)
+    results = [i for i in results][:5]
     return jsonify(matching_courses=results)
 
 @app.route('/search', methods=['POST', 'GET'])
 def search():
-    search_q = request.form['q']
-    # TODO: replace below with search from db
-    print("You just searched", search_q)
-    return main();
-
+    search_q = request.form['q'].upper()
+    parts = re.split('(\d.*)', search_q)
+    try:
+        sbj, number = parts[0].strip(), parts[1].strip()
+        print("You just searched", sbj, number)
+        q = ["SELECT * FROM `raw` WHERE subject = (%s) AND number = (%s)", sbj, number]
+        print(q)
+        course_info = get_data_from_sql(q)
+        print(course_info)
+    except:
+        course_info=None
+    return render_template("course_info.html", pageType='other', course_info=course_info)
 
 @app.route('/explore')
 def explore():
-    # cursor = mysql.connect().cursor()
-    # TODO: replace below with random search from db
-    # cursor.execute("SELECT * from `Gene`")
-    # data = cursor.fetchone()
-    # print(data)
     return render_template("explore.html", pageType='explore')
 
 @app.route('/profile', methods=['POST', 'GET'])
@@ -105,7 +126,6 @@ def signUp():
         print ("Error:", e)
         abort(401)
     finally:
-
         if cur is not None: cur.close() 
         if conn is not None: conn.close()
 
@@ -118,10 +138,37 @@ def signOut():
     return redirect('/')
     # return render_template('index.html', pageType='index')
 
+@app.route('/getall')
+def getall():
+    cursor = mysql.connect().cursor()
+    cursor.execute("SELECT subject, ROUND(AVG(overall_gpa), 2) as avg_gpa FROM course GROUP BY subject")
+    data = cursor.fetchall()
+
+    empList = []
+    for emp in data:
+        empDict = {
+            'subject': emp[0],
+            'avg_gpa': emp[1]
+        }
+        empList.append(empDict)
+
+    return json.dumps(empList)
+
+@app.route('/get_subject')
+def get_subject():
+    subject = request.args.get('subject', None)
+
+    cursor = mysql.connect().cursor()
+    cursor.execute("SELECT * FROM course WHERE subject= %s", subject)
+    course_list = cursor.fetchall()
+
+    return render_template('course.html', course_list=course_list)
+
 @app.route('/')
 def main():
     return render_template('index.html', pageType='index')
 
 if __name__ == "__main__":
+
     if(sys.platform=='linux'): app.run(host='0.0.0.0', port=80, use_reloader=True, threaded=True)
     else: app.run(debug=True, port=5001)
