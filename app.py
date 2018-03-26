@@ -160,7 +160,6 @@ def getall():
 @app.route('/get_subject')
 def get_subject():
     subject = request.args.get('subject', None)
-
     cursor = mysql.connect().cursor()
     cursor.execute("SELECT * FROM course WHERE subject= %s", subject)
     course_list = cursor.fetchall()
