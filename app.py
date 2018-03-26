@@ -1,19 +1,27 @@
-from flask import Flask, Response, render_template, json, request, redirect, abort, session, jsonify
+from flask import Flask, Response, render_template, json, request, redirect, abort, session, jsonify, flash
 from flaskext.mysql import MySQL
 import json, sys
 from werkzeug import generate_password_hash, check_password_hash
+from flask_sslify import SSLify
 
 mysql = MySQL()
 app = Flask(__name__)
+sslify = SSLify(app)
 
 # MySQL configurations
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
-app.config['MYSQL_DATABASE_DB'] = 'baselessdata_db'
-# app.config['MYSQL_DATABASE_USER'] = 'yuanyiz2_root'
-# app.config['MYSQL_DATABASE_PASSWORD'] = '12345root'
-# app.config['MYSQL_DATABASE_DB'] = 'yuanyiz2_baseless'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+if(sys.platform == 'linux' or sys.platform == 'darwin'):
+    app.config['MYSQL_DATABASE_USER'] = 'root'
+    app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
+    app.config['MYSQL_DATABASE_DB'] = 'baselessdata_db'
+    app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+    app.config['SECRET_KEY'] = 'whatever'
+else:
+    # app.config['MYSQL_DATABASE_USER'] = 'yuanyiz2_root'
+    # app.config['MYSQL_DATABASE_PASSWORD'] = '12345root'
+    # app.config['MYSQL_DATABASE_DB'] = 'yuanyiz2_baseless'
+    pass
+
+
 mysql.init_app(app)
 
 
@@ -23,7 +31,7 @@ def autocomplete():
     print(search)
     # query = db_session.query(Course.title).filter(Course.title.like('%' + str(search) + '%'))
     # TODO: replace below with above
-    results = ['CS411', 'CS543'] # just to check the autocompletion works
+    results = ['CS 411', 'CS 543'] # just to check the autocompletion works
     return jsonify(matching_courses=results)
 
 @app.route('/search', methods=['POST', 'GET'])
@@ -59,54 +67,44 @@ def fav_course():
 def signUp():
     _email = request.form['email']
     _password = request.form['password']
-    print(_email, _password)
     cur, conn = None, None
+    error = None
     try:
-        # TODO: Convert this query to python
-        # SQL: INSERT INTO Users VALUES ({_email}, {_password}, {_name})
-        
         # validate the received values
         if _email and _password:
-
-            # All Good, let's call MySQL
-
             conn = mysql.connect()
             cur = conn.cursor()
-            print (conn, cur)
             # check user existence first
-            # q = "SELECT * FROM tbl_user WHERE email=\"{}\" AND password_hash=\"{}\";".format(_email, _hashed_password)
             q = "SELECT * FROM tbl_user WHERE email=\"{}\";".format(_email)
             print (q)
             cur.execute(q)
             data = cur.fetchall()
             print (data)
 
-            if len(data) == 0:
+            if len(data) == 0: # user not exist: consider as sign up
                 _hashed_password = generate_password_hash(_password)
-                print (_hashed_password)
+                # print (_hashed_password)
 
                 cur.callproc('sp_createUser', (_email, _hashed_password))
-                data = cur.fetchall()
-                print (data)
+                conn.commit()
+                flash('Ohhh poor little guy that strays!', 'success')
 
-                if len(data) == 0:
-                    conn.commit()
-                    return json.dumps({'message':'User created successfully !'})
-                else:
-                    return json.dumps({'error':str(data[0])})
-            else:
-                if not check_password_hash(data[0][1], _password):
-                    return json.dumps({'error':'Wrong password !'})
-        else:
-            return json.dumps({'html':'<span>Enter the required fields</span>'})
+            elif not check_password_hash(data[0][1], _password):
+                error = 'Seems like you forgot your password, so miserable.'
+            else: 
+                flash('Why come back? Nothing has been updated.', 'success')
+        else: error = 'FILL OUT THE FORMS!' # Not used here: js already checked required fields
+        
+        if (error): flash(error, 'error')
+        else:       session['user'] = _email.split("@")[0]
 
-        session['user'] = _email
-        return json.dumps({'message':'Signed in successfully !'})
-        # TODO: Write handling here
+        return redirect('/')
+
     except Exception as e:
         print ("Error:", e)
         abort(401)
     finally:
+
         if cur is not None: cur.close() 
         if conn is not None: conn.close()
 
