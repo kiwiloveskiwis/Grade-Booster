@@ -44,7 +44,7 @@ def autocomplete():
     search = request.args.get('q_course').upper()
     regex_ = re.compile('.*' + '\s*'.join([i for i in search]) + '.*')
 
-    if ac_cache == None: 
+    if ac_cache == None:
         q = "SELECT DISTINCT subject, number FROM `raw`"
         all_data = get_data_from_sql(q)
         ac_cache = [d[0] + ' ' + str(d[1]) for d in all_data]
@@ -60,9 +60,9 @@ def search():
     try:
         sbj, number = parts[0].strip(), parts[1].strip()
         print("You just searched", sbj, number)
-        q = ["SELECT * FROM `raw` WHERE subject = (%s) AND number = (%s)", sbj, number]
-        print(q)
-        course_info = get_data_from_sql(q)
+        # q = ["SELECT * FROM `raw` WHERE subject = (%s) AND number = (%s)", sbj, number]
+        # print(q)
+        course_info = get_data_from_sql(query.aggregate_sections_grade(sbj, number))
         print(course_info)
     except:
         course_info=None
@@ -106,7 +106,7 @@ def insert_table(course_id):
         query.insert_favorite(email=session['user'], course_id=course_id)
     else:
         query.update_favorite(email=session['user'], old_course_id=replace_id, new_course_id=course_id) # update
-        
+
     return redirect('/fav_course')
 
 @app.route('/fav_course/del/<course_id>', )
@@ -142,12 +142,12 @@ def signUp():
 
             elif not check_password_hash(data[0][1], _password):
                 error = 'Seems like you forgot your password, so miserable.'
-            else: 
+            else:
                 flash('Why come back? Nothing has been updated.', 'success')
         else: error = 'FILL OUT THE FORMS!' # Not used here: js already checked required fields
-        
+
         if (error): flash(error, 'error')
-        else:       
+        else:
             session['user'] = _email
             session['uname'] = _email.split("@")[0]
         return redirect('/')
