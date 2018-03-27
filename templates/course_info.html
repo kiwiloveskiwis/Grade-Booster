@@ -3,11 +3,11 @@
  <body>
  	<div class="text-center">
 	{% if course_info %}
- 	<h1> {{course_info[0][3]}} </h1>
+ 	<!-- <h1> {{course_info[0][3]}} </h1> -->
  	<table class="table table-bordered">
     <thead>
       <tr>
-      	{% for title in ['subject', 'number', 'crn', 'title', 'ap', 'a', 'am', 'bp', 'b', 'bm', 'cp', 'c', 'cm', 'dp', 'd', 'dm', 'f', 'w', 'instructor', 'semester'][4:] %}
+      	{% for title in ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'W', 'Instructor', 'Semester'] %}
         <th>{{title}}</th>
         {% endfor %}
       </tr>
@@ -15,7 +15,7 @@
     <tbody>
     {% for items in course_info %}
     <tr>
-    	{% for it in items[4:] %}
+    	{% for it in items %}
         <td>{{it}}</td>
         {% endfor %}
     </tr>

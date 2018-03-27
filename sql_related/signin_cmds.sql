@@ -1,23 +1,14 @@
 CREATE DATABASE `baselessdata_db`;
 
-CREATE DATABASE #DB;
-
-CREATE TABLE IF NOT Exists #DB.tbl_user (
+CREATE TABLE IF NOT Exists `baselessdata_db`.tbl_user (
     email VARCHAR(100),
     password_hash VARCHAR(256),
     PRIMARY KEY(email)
 
-CREATE TABLE IF NOT Exists `baselessdata_db`.tbl_user (
-    email varchar(100),
-    password_hash varchar(256),
-    primary key(email)
-    );
-
-CREATE TABLE IF NOT EXISTS favorite(
+CREATE TABLE IF NOT EXISTS `baselessdata_db`.favorite(
 	EMAIL VARCHAR(255),
 	COURSE_ID VARCHAR(255)
 );
-
 
 USE `baselessdata_db`;
 
