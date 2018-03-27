@@ -1,6 +1,7 @@
 from flask import Flask, Response, render_template, json, request, redirect, abort, session, jsonify, flash
 from flaskext.mysql import MySQL
-import json, sys
+import simplejson as json
+import sys
 from werkzeug import generate_password_hash, check_password_hash
 from flask_sslify import SSLify
 import re
@@ -23,7 +24,6 @@ ac_cache = None
 #     app.config['MYSQL_DATABASE_DB'] = 'baselessdata_db'
 #     # sslify = SSLify(app)
 #     SSLify(app)
-
 
 app.config['MYSQL_DATABASE_USER'] = 'tianyu'
 app.config['MYSQL_DATABASE_PASSWORD'] = '515253'
@@ -164,7 +164,41 @@ def get_subject():
     cursor.execute("SELECT * FROM course WHERE subject= %s", subject)
     course_list = cursor.fetchall()
 
-    return render_template('course.html', course_list=course_list)
+    return render_template('course_list.html', course_list=course_list)
+
+@app.route('/course_info')
+def course_info():
+    subject = request.args.get('subject', None)
+    number = request.args.get('number', None)
+    title = request.args.get('title', None)
+
+    q = "SELECT subject, number, crn, title, SUM(ap), SUM(a), SUM(am), SUM(bp), SUM(b), SUM(bm), SUM(cp), SUM(c), SUM(cm), \
+        SUM(dp), SUM(d), SUM(dm), SUM(f), SUM(w), instructor, semester FROM `raw` \
+        WHERE subject = '%s' AND number = %s AND title LIKE '%s%%' GROUP BY semester, instructor" % (subject, number, title)
+    course_info = get_data_from_sql(q)
+    print(q)
+    empList = []
+    for emp in course_info:
+        empDict = {
+            'subject': emp[0], 'number': emp[1], 'crn': emp[2], 'title': emp[3],
+            'ap': emp[4], 'a': emp[5], 'am': emp[6], 
+            'bp': emp[7], 'b': emp[8], 'bm': emp[9],
+            'cp': emp[10], 'c': emp[11], 'cm': emp[12],
+            'dp': emp[13], 'd': emp[14], 'dm': emp[15], 
+            'f': emp[16], 'w': emp[17],
+            'instructor': emp[18], 'semester': emp[19]
+        }
+        empList.append(empDict)
+
+    return json.dumps(empList)
+
+@app.route('/course')
+def course():
+    subject = request.args.get('subject', None)
+    number = request.args.get('number', None)
+    title = request.args.get('title', None)
+
+    return render_template('course_detail.html', subject=subject, number=number, title=title)
 
 @app.route('/')
 def main():
