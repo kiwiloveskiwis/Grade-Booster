@@ -90,10 +90,13 @@ def tableview():
 
 
 ####### Fav_course #######
-@app.route('/fav_course', methods=['POST', 'GET'])
+@app.route('/fav_course', methods=['GET'])
 def fav_course():
     # TODO: replace below with actual db search
-    items = [['CS', '411', '4.0']]
+    # items = [['CS', '411', '4.0']]
+    q = query.get_favorite(session['user'])
+    items = get_data_from_sql(q)
+    print (items)
     # cur = g.db.execute('select title, text from entries order by id desc')
     # items = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
     return render_template("fav_course.html", pageType='account', items=items)
@@ -101,17 +104,29 @@ def fav_course():
 @app.route('/fav_course/add/<course_id>', )
 def insert_table(course_id):
     replace_id = request.args.get('replace', default=None)
-    cursor = mysql.get_db().cursor()
     if(not replace_id): # insert
-        query.insert_favorite(email=session['user'], course_id=course_id)
+        print ("fav insert", course_id, replace_id)
+        q = query.insert_favorite(email=session['user'], course_id=course_id)
     else:
-        query.update_favorite(email=session['user'], old_course_id=replace_id, new_course_id=course_id) # update
-
+        print ("fav replace", course_id, replace_id)
+        q = query.update_favorite(email=session['user'], old_course_id=replace_id, new_course_id=course_id) # update
+    print (q)
+    # get_data_from_sql(q)
+    conn = mysql.get_db()
+    cur = conn.cursor()
+    cur.execute(q)
+    conn.commit()
+    # cursor.fetchall()
     return redirect('/fav_course')
 
 @app.route('/fav_course/del/<course_id>', )
 def delete_table(course_id):
-    query.remove_favorite(email=session['user'], course_id=course_id)
+    q = query.remove_favorite(email=session['user'], course_id=course_id)
+    # get_data_from_sql(q)
+    conn = mysql.get_db()
+    cur = conn.cursor()
+    cur.execute(q)
+    conn.commit()
     return redirect('/fav_course')
 
 
@@ -186,10 +201,15 @@ def get_subject():
     subject = request.args.get('subject', None)
 
     cursor = mysql.connect().cursor()
-    cursor.execute("SELECT * FROM course WHERE subject= %s", subject)
-    course_list = cursor.fetchall()
+    # cursor.execute("SELECT * FROM course WHERE subject= %s", subject)
+    # course_list = cursor.fetchall()
 
-    return render_template('course.html', course_list=course_list)
+    # return render_template('course.html', course_list=course_list)
+    cursor.execute("SELECT DISTINCT subject,number,title FROM raw WHERE subject=%s", subject)
+    course_list = cursor.fetchall()
+    print (course_list)
+    is_fav = [False] * len(course_list)
+    return render_template('tableview.html', items=course_list, is_fav=is_fav)
 
 @app.route('/')
 def main():

@@ -1,3 +1,8 @@
+def get_favorite(email):
+    return """
+        SELECT * FROM favorite WHERE EMAIL = '{email}';
+    """.format(email = email)
+
 def insert_favorite(email, course_id):
     return """
         INSERT INTO favorite (EMAIL, COURSE_ID)
