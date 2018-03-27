@@ -1,7 +1,10 @@
 def get_favorite(email):
     return """
-        
-        SELECT COURSE_SUB, COURSE_NUM FROM favorite WHERE EMAIL = '{email}';
+        SELECT favorite.course_sub, favorite.course_num, course.title, course.overall_gpa
+        FROM course, favorite 
+        WHERE favorite.EMAIL = '{email}' AND favorite.COURSE_SUB = course.Subject \
+            AND favorite.COURSE_NUM = course.NUMBER
+        ;
     """.format(email = email)
 
 def insert_favorite(email, course_sub, course_num):

@@ -92,10 +92,7 @@ def profile():
 ####### Fav_course #######
 @app.route('/fav_course', methods=['GET'])
 def fav_course():
-    ## TODO: replace below with a more complicated sql query
-    ## intersect, etc.
-    q = query.get_favorite(session['user'])
-    items = get_data_from_sql(q) # (('CS411', 0), ('Math540', 0), (...))
+    items = get_data_from_sql(query.get_favorite(session['user']))
     is_fav = [True] * len(items)
     return render_template("tableview.html", pageType='account', items=items, is_fav=is_fav)
 
@@ -165,6 +162,10 @@ def signOut():
     session.pop('user', None)
     return redirect('/')
 
+
+############## End of SignUp ############
+
+
 @app.route('/getall')
 def getall():
     q = "SELECT subject, ROUND(AVG(overall_gpa), 2) as avg_gpa FROM course GROUP BY subject"
@@ -184,12 +185,14 @@ def getall():
 def get_subject():
     subject = request.args.get('subject', None)
 
-    # return render_template('course_list.html', course_list=course_list)
-    q = ["SELECT DISTINCT subject, number, title FROM raw WHERE subject=%s ORDER BY number", subject]
+    q = ["SELECT DISTINCT subject, number, title, ROUND(AVG(overall_gpa), 2) FROM course \
+            WHERE subject=%s \
+            GROUP BY subject, number, title",  # TODO: ORDER BY before GROUP BY? 
+        subject]
     course_list = get_data_from_sql(q)
 
-    # print ("course_list")
-    is_fav = [False] * len(course_list)
+    ## TODO: replace below with actual query of `favorite`
+    is_fav = [False] * len(course_list) 
     return render_template('tableview.html', items=course_list, is_fav=is_fav) 
  
 @app.route('/course_info')
@@ -226,6 +229,9 @@ def course():
     title = request.args.get('title', None)
 
     return render_template('course_detail.html', subject=subject, number=number, title=title)
+
+
+############## Main ##############
 
 @app.route('/')
 def main():
