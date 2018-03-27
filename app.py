@@ -126,7 +126,8 @@ def signUp():
     try:
         # validate the received values
         if _email and _password:
-            cur = mysql.get_db().cursor()
+            conn = mysql.get_db()
+            cur = conn.cursor()
             # check user existence first
             q = "SELECT * FROM tbl_user WHERE email=\"{}\";".format(_email)
             cur.execute(q)
