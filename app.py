@@ -209,7 +209,7 @@ def get_subject():
     # course_list = cursor.fetchall()
 
     # return render_template('course_list.html', course_list=course_list)
-    cursor.execute("SELECT DISTINCT subject,number,title FROM raw WHERE subject=%s", subject)
+    cursor.execute("SELECT DISTINCT subject,number,title FROM raw WHERE subject=%s ORDER BY number", subject)
     course_list = cursor.fetchall()
     print (course_list)
     is_fav = [False] * len(course_list)
