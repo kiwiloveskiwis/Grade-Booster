@@ -2,12 +2,13 @@ CREATE DATABASE `baselessdata_db`;
 
 CREATE TABLE IF NOT Exists `baselessdata_db`.tbl_user (
     email VARCHAR(100),
-    password_hash VARCHAR(256),
+    password_hash VARCHAR(255),
     PRIMARY KEY(email)
 
 CREATE TABLE IF NOT EXISTS `baselessdata_db`.favorite(
 	EMAIL VARCHAR(255),
-	COURSE_ID VARCHAR(255)
+	COURSE_SUB VARCHAR(255),
+    COURSE_NUM int(11) 
 );
 
 USE `baselessdata_db`;

@@ -1,28 +1,30 @@
 def get_favorite(email):
     return """
-        SELECT COURSE_ID FROM favorite WHERE EMAIL = '{email}';
+        
+        SELECT COURSE_SUB, COURSE_NUM FROM favorite WHERE EMAIL = '{email}';
     """.format(email = email)
 
-def insert_favorite(email, course_id):
+def insert_favorite(email, course_sub, course_num):
     return """
-        INSERT INTO favorite (EMAIL, COURSE_ID)
-        SELECT * FROM (SELECT '{email}', '{course_id}') AS TMP
+        INSERT INTO favorite (EMAIL, COURSE_SUB, COURSE_NUM)
+        SELECT * FROM (SELECT '{email}', '{course_sub}', '{course_num}') AS TMP
         WHERE NOT EXISTS (
-	    SELECT * FROM favorite WHERE EMAIL = '{email}' AND COURSE_ID = '{course_id}'
-        ) LIMIT 1""".format(email = email, course_id = course_id)
+	    SELECT * FROM favorite WHERE EMAIL = '{email}' \
+                AND COURSE_SUB = '{course_sub}' AND COURSE_NUM = '{course_num}'
+        ) LIMIT 1""".format(email=email, course_num = course_num, course_sub=course_sub)
 
-def update_favorite(email, old_course_id, new_course_id):
+def update_favorite(email, old_course_sub, old_course_num, new_course_sub, new_course_num):
     return """
         UPDATE favorite
-        SET COURSE_ID = '{new_course_id}'
-        WHERE EMAIL = '{email}' AND COURSE_ID = '{old_course_id}'
-    """.format(email=email, old_course_id=old_course_id, new_course_id=new_course_id)
+        SET COURSE_SUB = '{new_course_sub}', COURSE_NUM = '{new_course_num}'
+        WHERE EMAIL = '{email}' AND COURSE_SUB = '{old_course_sub}' AND COURSE_NUM = '{old_course_num}'
+    """.format(email=email, old_course_sub=old_course_sub, old_course_num=old_course_num, new_course_sub=new_course_sub, new_course_num=new_course_num)
 
-def remove_favorite(email, course_id):
+def remove_favorite(email, course_sub, course_num):
     return """
         DELETE FROM favorite
-        WHERE EMAIL = '{email}' AND COURSE_ID = '{course_id}'
-    """.format(email=email, course_id=course_id)
+        WHERE EMAIL = '{email}' COURSE_SUB = '{course_sub}' AND COURSE_NUM = '{course_num}'
+    """.format(email=email, course_sub=course_sub, course_num=course_num)
 
 def aggregate_sections_grade(subject_name, subject_number):
     return """

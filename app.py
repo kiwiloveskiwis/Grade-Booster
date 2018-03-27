@@ -78,15 +78,15 @@ def explore():
 def profile():
     return render_template("profile.html", pageType='account')
 
-
-@app.route('/tableview')
-def tableview():
-    # Subject, Number, Title, GPA,
-    items = [['CS', '411', 'Database', '4.0'],
-             ['CS', '412', 'Introduction to Data Mining', '4.0']]
-    is_fav = [False,
-              True]
-    return render_template("tableview.html", pageType='tableview', items=items, is_fav=is_fav)
+# Just for testing
+# @app.route('/tableview')
+# def tableview():
+#     # Subject, Number, Title, GPA,
+#     items = [['CS', '411', 'Database', '4.0'],
+#              ['CS', '412', 'Introduction to Data Mining', '4.0']]
+#     is_fav = [False,
+#               True]
+#     return render_template("tableview.html", pageType='tableview', items=items, is_fav=is_fav)
 
 
 ####### Fav_course #######
@@ -96,24 +96,27 @@ def fav_course():
     ## intersect, etc.
     q = query.get_favorite(session['user'])
     items = get_data_from_sql(q) # (('CS411', 0), ('Math540', 0), (...))
-    items = [re.split('(\d.*)', item[0]) for item in items] 
     is_fav = [True] * len(items)
     return render_template("tableview.html", pageType='account', items=items, is_fav=is_fav)
 
-@app.route('/fav_course/add/<course_id>', )
-def insert_table(course_id):
+@app.route('/fav_course/add', )
+def insert_table():
+    sub = request.args.get('sub', default=None)
+    num = request.args.get('num', default=None)
+    print(sub, num)
     replace_id = request.args.get('replace', default=None)
     if(not replace_id): # insert
-        q = query.insert_favorite(email=session['user'], course_id=course_id)
-    else:
-        q = query.update_favorite(email=session['user'], old_course_id=replace_id, new_course_id=course_id) # update
-
+        q = query.insert_favorite(email=session['user'], course_sub=sub, course_num=num)
+    # else:
+    #     q = query.update_favorite(email=session['user'], old_course_sub=sub, old_course_num=num, new_course_id=course_id) # update
     get_data_from_sql(q, commit=True)
     return redirect('/fav_course')
 
-@app.route('/fav_course/del/<course_id>', )
-def delete_table(course_id):
-    q = query.remove_favorite(email=session['user'], course_id=course_id)
+@app.route('/fav_course/del', )
+def delete_table():
+    sub = request.args.get('sub', default=None)
+    num = request.args.get('num', default=None)
+    q = query.remove_favorite(email=session['user'], course_sub=sub, course_num=num)
     get_data_from_sql(q, commit=True)
     return redirect('/fav_course')
 
