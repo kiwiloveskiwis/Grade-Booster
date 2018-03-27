@@ -39,7 +39,7 @@
                   {% if 'user' in session %}
                   <li class="nav-item dropdown">
                      <a class="nav-link dropdown-toggle {% if 'account' == active_page %} active {% endif %}" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"  >
-                        {{ session['user'] }}
+                        {{ session['uname'] }}
                      </a>
                      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="/profile">Profile</a>
@@ -57,7 +57,7 @@
                     <a class="nav-link" href="#signUp" data-toggle="modal" role="button" data-target="#signUpModal">Login</a>
                   </li> -->
                </ul>
-               <form class="form-inline my-2 my-lg-0"  method="post" action='/search'>
+               <form class="form-inline my-2 my-lg-0"  method="get" action='/search'>
                   <input class="form-control mr-sm-2" name="q" type="search" placeholder="Search" aria-label="Search" id="autocomplete">
                   <button class="btn btn-outline-info my-2 my-sm-0" type="submit" >Search</button>
                </form>

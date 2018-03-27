@@ -5,10 +5,10 @@ from werkzeug import generate_password_hash, check_password_hash
 from flask_sslify import SSLify
 import re
 
+import query
 
 mysql = MySQL()
 app = Flask(__name__)
-sslify = SSLify(app)
 ac_cache = None
 
 # MySQL configurations
@@ -21,8 +21,7 @@ else:
     app.config['MYSQL_DATABASE_USER'] = 'root'
     app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
     app.config['MYSQL_DATABASE_DB'] = 'baselessdata_db'
-    # sslify = SSLify(app)
-    SSLify(app)
+    sslify = SSLify(app)
 
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['SECRET_KEY'] = 'whatever'
@@ -39,7 +38,7 @@ def get_data_from_sql(q):
     conn.close(); cur.close()
     return data
 
-@app.route('/autocomplete', methods=['GET'])
+@app.route('/autocomplete', methods=['GET', 'POST'])
 def autocomplete():
     global ac_cache
     search = request.args.get('q_course').upper()
@@ -54,9 +53,9 @@ def autocomplete():
     results = [i for i in results][:5]
     return jsonify(matching_courses=results)
 
-@app.route('/search', methods=['POST', 'GET'])
+@app.route('/search', methods=['GET'])
 def search():
-    search_q = request.form['q'].upper()
+    search_q = request.args['q'].upper()
     parts = re.split('(\d.*)', search_q)
     try:
         sbj, number = parts[0].strip(), parts[1].strip()
@@ -77,6 +76,20 @@ def explore():
 def profile():
     return render_template("profile.html", pageType='account')
 
+
+@app.route('/tableview')
+def tableview():
+    # Subject, Number, Title, GPA,
+    items = [['CS', '411', 'Database', '4.0'],
+             ['CS', '412', 'Introduction to Data Mining', '4.0']]
+    is_fav = [False,
+              True]
+    # is_fav = ['False',
+    #           'True']
+    return render_template("tableview.html", pageType='tableview', items=items, is_fav=is_fav)
+
+
+####### Fav_course #######
 @app.route('/fav_course', methods=['POST', 'GET'])
 def fav_course():
     # TODO: replace below with actual db search
@@ -84,6 +97,25 @@ def fav_course():
     # cur = g.db.execute('select title, text from entries order by id desc')
     # items = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
     return render_template("fav_course.html", pageType='account', items=items)
+
+@app.route('/fav_course/add/<course_id>', )
+def insert_table(course_id):
+    replace_id = request.args.get('replace', default=None)
+    cursor = mysql.get_db().cursor()
+    if(not replace_id): # insert
+        query.insert_favorite(email=session['user'], course_id=course_id)
+    else:
+        query.update_favorite(email=session['user'], old_course_id=replace_id, new_course_id=course_id) # update
+        
+    return redirect('/fav_course')
+
+@app.route('/fav_course/del/<course_id>', )
+def delete_table(course_id):
+    query.remove_favorite(email=session['user'], course_id=course_id)
+    return redirect('/fav_course')
+
+
+###############################
 
 @app.route('/signUp', methods=['POST'])
 def signUp():
@@ -94,14 +126,11 @@ def signUp():
     try:
         # validate the received values
         if _email and _password:
-            conn = mysql.connect()
-            cur = conn.cursor()
+            cur = mysql.get_db().cursor()
             # check user existence first
             q = "SELECT * FROM tbl_user WHERE email=\"{}\";".format(_email)
-            print (q)
             cur.execute(q)
             data = cur.fetchall()
-            print (data)
 
             if len(data) == 0: # user not exist: consider as sign up
                 _hashed_password = generate_password_hash(_password)
@@ -118,16 +147,14 @@ def signUp():
         else: error = 'FILL OUT THE FORMS!' # Not used here: js already checked required fields
         
         if (error): flash(error, 'error')
-        else:       session['user'] = _email.split("@")[0]
-
+        else:       
+            session['user'] = _email
+            session['uname'] = _email.split("@")[0]
         return redirect('/')
 
     except Exception as e:
         print ("Error:", e)
         abort(401)
-    finally:
-        if cur is not None: cur.close() 
-        if conn is not None: conn.close()
 
 @app.route('/signOut')
 def signOut():
@@ -147,7 +174,7 @@ def getall():
     for emp in data:
         empDict = {
             'subject': emp[0],
-            'avg_gpa': emp[1]
+            'avg_gpa': float(emp[1])
         }
         empList.append(empDict)
 

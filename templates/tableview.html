@@ -1,0 +1,62 @@
+{% extends "index.html" %}
+<!-- {% set active_page = "fav_course" %} -->
+{% block body %}
+ <body>
+ 	<div class="text-center">
+	<!-- <table class="table table-bordered table-editable" id='tableview'> -->
+  <table class="table " id='tableview'>
+    <thead>
+      <tr>
+        <th>Subject</th>
+        <th>Number</th>
+        <th>Title</th>
+        <th>Avg GPA</th>
+        <th>Favorites</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for item in items %}
+    <tr>
+        <!-- <td>{{item[0]}}</td> -->
+        <td>
+          <a href="/get_subject?subject={{item[0]}}"> {{item[0]}} </a>
+        <!-- <td>{{item[1]}}</td> -->
+        <td>
+          <!-- <a class="nav-link" href="/search?q={{item[0]}}"> {{item[1]}} </a> -->
+          <a href="/search?q={{item[0]}}{{item[1]}}"> {{item[1]}} </a>
+        </td>
+        <td>
+          <!-- <a class="nav-link" href="/search?q={{item[0]}}"> {{item[1]}} </a> -->
+          <a href="/search?q={{item[0]}}{{item[1]}}"> {{item[2]}} </a>
+        </td>
+        <!-- <td>{{item[2]}}</td> -->
+        <td>{{item[3]}}</td>
+        <!-- <td>{{is_fav[loop.index-1]}}</td> -->
+        <!-- <td>{{is_fav[loop.index-1]}} -->
+        <td>
+        <div class="btn-group pull-right">
+          <!-- <button id="bEdit" type="button" class="btn btn-sm btn-default" onclick="rowEdit(this);"> -->
+          {% if is_fav[loop.index-1] %}
+          <button id="bAddFav" type="button" class="btn btn-sm btn-default"
+          onclick="location.href='/fav_course/del/{{item[0]}}{{item[1]}}';">
+          <span class="fas fa-star" style='color:#FFC300'> </span>
+          </button>
+          {% else %}
+          <button id="bAddFav" type="button" class="btn btn-sm btn-default"
+          onclick="location.href='/fav_course/add/{{item[0]}}{{item[1]}}';">
+          <span class="far fa-star"> </span>
+          </button>
+          {% endif %}
+          
+        </div>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <!-- <button class="btn btn-md btn-outline-info" role="button" >Add new</button> -->
+  </div>
+  <p />
+ </body>
+
+{% endblock %}
