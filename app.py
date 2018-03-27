@@ -6,10 +6,10 @@ from werkzeug import generate_password_hash, check_password_hash
 from flask_sslify import SSLify
 import re
 
+import query
 
 mysql = MySQL()
 app = Flask(__name__)
-# sslify = SSLify(app)
 ac_cache = None
 
 # # MySQL configurations
@@ -43,13 +43,13 @@ def get_data_from_sql(q):
     conn.close(); cur.close()
     return data
 
-@app.route('/autocomplete', methods=['GET'])
+@app.route('/autocomplete', methods=['GET', 'POST'])
 def autocomplete():
     global ac_cache
     search = request.args.get('q_course').upper()
     regex_ = re.compile('.*' + '\s*'.join([i for i in search]) + '.*')
 
-    if ac_cache == None: 
+    if ac_cache == None:
         q = "SELECT DISTINCT subject, number FROM `raw`"
         all_data = get_data_from_sql(q)
         ac_cache = [d[0] + ' ' + str(d[1]) for d in all_data]
@@ -58,16 +58,16 @@ def autocomplete():
     results = [i for i in results][:5]
     return jsonify(matching_courses=results)
 
-@app.route('/search', methods=['POST', 'GET'])
+@app.route('/search', methods=['GET'])
 def search():
-    search_q = request.form['q'].upper()
+    search_q = request.args['q'].upper()
     parts = re.split('(\d.*)', search_q)
     try:
         sbj, number = parts[0].strip(), parts[1].strip()
         print("You just searched", sbj, number)
-        q = ["SELECT * FROM `raw` WHERE subject = (%s) AND number = (%s)", sbj, number]
-        print(q)
-        course_info = get_data_from_sql(q)
+        # q = ["SELECT * FROM `raw` WHERE subject = (%s) AND number = (%s)", sbj, number]
+        # print(q)
+        course_info = get_data_from_sql(query.aggregate_sections_grade(sbj, number))
         print(course_info)
     except:
         course_info=None
@@ -81,13 +81,61 @@ def explore():
 def profile():
     return render_template("profile.html", pageType='account')
 
-@app.route('/fav_course', methods=['POST', 'GET'])
+
+@app.route('/tableview')
+def tableview():
+    # Subject, Number, Title, GPA,
+    items = [['CS', '411', 'Database', '4.0'],
+             ['CS', '412', 'Introduction to Data Mining', '4.0']]
+    is_fav = [False,
+              True]
+    # is_fav = ['False',
+    #           'True']
+    return render_template("tableview.html", pageType='tableview', items=items, is_fav=is_fav)
+
+
+####### Fav_course #######
+@app.route('/fav_course', methods=['GET'])
 def fav_course():
     # TODO: replace below with actual db search
-    items = [['CS', '411', '4.0']]
+    # items = [['CS', '411', '4.0']]
+    q = query.get_favorite(session['user'])
+    items = get_data_from_sql(q)
+    print (items)
     # cur = g.db.execute('select title, text from entries order by id desc')
     # items = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
     return render_template("fav_course.html", pageType='account', items=items)
+
+@app.route('/fav_course/add/<course_id>', )
+def insert_table(course_id):
+    replace_id = request.args.get('replace', default=None)
+    if(not replace_id): # insert
+        print ("fav insert", course_id, replace_id)
+        q = query.insert_favorite(email=session['user'], course_id=course_id)
+    else:
+        print ("fav replace", course_id, replace_id)
+        q = query.update_favorite(email=session['user'], old_course_id=replace_id, new_course_id=course_id) # update
+    print (q)
+    # get_data_from_sql(q)
+    conn = mysql.get_db()
+    cur = conn.cursor()
+    cur.execute(q)
+    conn.commit()
+    # cursor.fetchall()
+    return redirect('/fav_course')
+
+@app.route('/fav_course/del/<course_id>', )
+def delete_table(course_id):
+    q = query.remove_favorite(email=session['user'], course_id=course_id)
+    # get_data_from_sql(q)
+    conn = mysql.get_db()
+    cur = conn.cursor()
+    cur.execute(q)
+    conn.commit()
+    return redirect('/fav_course')
+
+
+###############################
 
 @app.route('/signUp', methods=['POST'])
 def signUp():
@@ -98,14 +146,12 @@ def signUp():
     try:
         # validate the received values
         if _email and _password:
-            conn = mysql.connect()
+            conn = mysql.get_db()
             cur = conn.cursor()
             # check user existence first
             q = "SELECT * FROM tbl_user WHERE email=\"{}\";".format(_email)
-            print (q)
             cur.execute(q)
             data = cur.fetchall()
-            print (data)
 
             if len(data) == 0: # user not exist: consider as sign up
                 _hashed_password = generate_password_hash(_password)
@@ -117,21 +163,19 @@ def signUp():
 
             elif not check_password_hash(data[0][1], _password):
                 error = 'Seems like you forgot your password, so miserable.'
-            else: 
+            else:
                 flash('Why come back? Nothing has been updated.', 'success')
         else: error = 'FILL OUT THE FORMS!' # Not used here: js already checked required fields
-        
-        if (error): flash(error, 'error')
-        else:       session['user'] = _email.split("@")[0]
 
+        if (error): flash(error, 'error')
+        else:
+            session['user'] = _email
+            session['uname'] = _email.split("@")[0]
         return redirect('/')
 
     except Exception as e:
         print ("Error:", e)
         abort(401)
-    finally:
-        if cur is not None: cur.close() 
-        if conn is not None: conn.close()
 
 @app.route('/signOut')
 def signOut():
@@ -151,7 +195,7 @@ def getall():
     for emp in data:
         empDict = {
             'subject': emp[0],
-            'avg_gpa': emp[1]
+            'avg_gpa': float(emp[1])
         }
         empList.append(empDict)
 
@@ -161,11 +205,16 @@ def getall():
 def get_subject():
     subject = request.args.get('subject', None)
     cursor = mysql.connect().cursor()
-    cursor.execute("SELECT * FROM course WHERE subject= %s", subject)
+    # cursor.execute("SELECT * FROM course WHERE subject= %s", subject)
+    # course_list = cursor.fetchall()
+
+    # return render_template('course_list.html', course_list=course_list)
+    cursor.execute("SELECT DISTINCT subject,number,title FROM raw WHERE subject=%s", subject)
     course_list = cursor.fetchall()
-
-    return render_template('course_list.html', course_list=course_list)
-
+    print (course_list)
+    is_fav = [False] * len(course_list)
+    return render_template('tableview.html', items=course_list, is_fav=is_fav) 
+ 
 @app.route('/course_info')
 def course_info():
     subject = request.args.get('subject', None)
