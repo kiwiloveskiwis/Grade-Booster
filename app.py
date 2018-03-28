@@ -62,9 +62,10 @@ def autocomplete():
 def search():
     search_q = request.args['q'].upper()
     parts = re.split('(\d.*)', search_q)
+    print(parts)
     try:
+        if(len(parts) == 1): return redirect('/get_subject?subject=%s'%parts[0].strip())
         sbj, number = parts[0].strip(), parts[1].strip()
-        print("You just searched", sbj, number)
         course_info = get_data_from_sql(query.aggregate_sections_grade(sbj, number))
     except:
         course_info=None
