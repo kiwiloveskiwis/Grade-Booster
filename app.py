@@ -108,7 +108,7 @@ def insert_table():
     # else:
     #     q = query.update_favorite(email=session['user'], old_course_sub=sub, old_course_num=num, new_course_id=course_id) # update
     get_data_from_sql(q, commit=True)
-    return redirect('/fav_course')
+    return redirect(request.referrer if request.referrer else '/fav_course')
 
 @app.route('/fav_course/del', )
 def delete_table():
@@ -116,7 +116,7 @@ def delete_table():
     num = request.args.get('num', default=None)
     q = query.remove_favorite(email=session['user'], course_sub=sub, course_num=num)
     get_data_from_sql(q, commit=True)
-    return redirect('/fav_course')
+    return redirect(request.referrer if request.referrer else '/fav_course')
 
 
 ###############################
@@ -187,8 +187,12 @@ def get_subject():
     subject = request.args.get('subject', None)
     course_list = get_data_from_sql(query.get_subject(subject))
 
-    ## TODO: replace below with actual query of `favorite`
-    is_fav = [False] * len(course_list) 
+    if session["user"]:
+        fav_list = { (_[0],_[1]) for _ in get_data_from_sql(query.get_favorite(session["user"])) }
+        # print (fav_list)
+        is_fav = [(_[0],_[1]) in fav_list for _ in course_list]
+    else:
+        is_fav = [False] * len(course_list)
     return render_template('tableview.html', items=course_list, is_fav=is_fav) 
  
 @app.route('/course_info')
