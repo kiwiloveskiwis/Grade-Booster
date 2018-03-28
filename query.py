@@ -35,7 +35,7 @@ def update_favorite(email, old_course_sub, old_course_num, new_course_sub, new_c
 def remove_favorite(email, course_sub, course_num):
     return """
         DELETE FROM favorite
-        WHERE EMAIL = '{email}' COURSE_SUB = '{course_sub}' AND COURSE_NUM = '{course_num}'
+        WHERE EMAIL = '{email}' AND COURSE_SUB = '{course_sub}' AND COURSE_NUM = '{course_num}'
     """.format(email=email, course_sub=course_sub, course_num=course_num)
 
 def aggregate_sections_grade(subject_name, subject_number): # Group By
