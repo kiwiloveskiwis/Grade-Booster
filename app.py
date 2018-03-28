@@ -148,7 +148,8 @@ def signUp():
                 flash('Why come back? Nothing has been updated.', 'success')
         else: error = 'FILL OUT THE FORMS!' # Not used here: js already checked required fields
 
-        if (error): flash(error, 'error')
+        if (error): 
+            flash(error, 'error')
         else:
             session['user'] = _email
             session['uname'] = _email.split("@")[0]
@@ -187,7 +188,7 @@ def get_subject():
     subject = request.args.get('subject', None)
     course_list = get_data_from_sql(query.get_subject(subject))
 
-    if session["user"]:
+    if "user" in session:
         fav_list = { (_[0],_[1]) for _ in get_data_from_sql(query.get_favorite(session["user"])) }
         # print (fav_list)
         is_fav = [(_[0],_[1]) in fav_list for _ in course_list]

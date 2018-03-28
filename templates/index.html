@@ -233,43 +233,7 @@
               } 
             });
          </script>
-
-
-         <script type="text/javascript">
-         // editable table in /fav_course
-            console.log($('.table-editable'))
-            $('.table-editable').SetEditable({
-              columnsEd: "0,1",
-              $addButton: $( "button" ),
-              onEdit: function($row) {
-                  var $cols = $row.find('td');
-                  var colLength = $cols.length;
-                  for (i = 0; i < colLength - 1; i++){ 
-                     // The last item is for buttons
-                     console.log($cols[i]);
-                  }
-              }, 
-              onDelete: function() {}, 
-              onBeforeDelete: function($row) {
-                  var $cols = $row.find('td');
-                  var colLength = $cols.length;
-                  for (i = 0; i < colLength - 1; i++){ 
-                     // TODO: delete data on db
-                     console.log($cols[i]);
-                  }
-              },
-              onAdd: function() {
-                   // var number = prompt("Please enter a number:");
-                   // document.write('<table border="1">');
-                   // for (i=1; i <= number; i++) {
-                   //     document.write('<tr><td>' + number + " x " + i + "</td><td>=</td><td>" + i*number + "</td></tr>");
-                   // };
-                   // document.write('</table>');
-              } 
-            });
-         </script>
-
-
+         
          <script type="text/javascript">
          // Autocomplete for searches
          $(function() {
