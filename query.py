@@ -1,4 +1,13 @@
-def get_favorite(email):
+def get_subject(subject): # Group By
+    return """  
+        SELECT DISTINCT subject, number, title, ROUND(AVG(overall_gpa), 2) FROM course \
+        WHERE subject='{subject}' \
+        GROUP BY subject, number, title
+        ;
+    """.format(subject = subject)
+
+
+def get_favorite(email): # Natural join 
     return """
         SELECT favorite.course_sub, favorite.course_num, course.title, course.overall_gpa
         FROM course, favorite 
@@ -29,7 +38,7 @@ def remove_favorite(email, course_sub, course_num):
         WHERE EMAIL = '{email}' COURSE_SUB = '{course_sub}' AND COURSE_NUM = '{course_num}'
     """.format(email=email, course_sub=course_sub, course_num=course_num)
 
-def aggregate_sections_grade(subject_name, subject_number):
+def aggregate_sections_grade(subject_name, subject_number): # Group By
     return """
         SELECT SUM(ap) as ap, SUM(a) as a, SUM(am) as am, SUM(bp) as bp, SUM(b) as b, \
                SUM(bm) as bm, SUM(cp) as cp, SUM(c) as c, SUM(cm) as cm, SUM(dp) as dp, \

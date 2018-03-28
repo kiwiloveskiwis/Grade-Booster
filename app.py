@@ -50,7 +50,7 @@ def autocomplete():
     regex_ = re.compile('.*' + '\s*'.join([i for i in search]) + '.*')
 
     if ac_cache == None:
-        q = "SELECT DISTINCT subject, number FROM `raw`"
+        q = "SELECT DISTINCT subject, number FROM `course`"
         all_data = get_data_from_sql(q)
         ac_cache = [d[0] + ' ' + str(d[1]) for d in all_data]
 
@@ -184,12 +184,7 @@ def getall():
 @app.route('/get_subject')
 def get_subject():
     subject = request.args.get('subject', None)
-
-    q = ["SELECT DISTINCT subject, number, title, ROUND(AVG(overall_gpa), 2) FROM course \
-            WHERE subject=%s \
-            GROUP BY subject, number, title",  # TODO: ORDER BY before GROUP BY? 
-        subject]
-    course_list = get_data_from_sql(q)
+    course_list = get_data_from_sql(query.get_subject(subject))
 
     ## TODO: replace below with actual query of `favorite`
     is_fav = [False] * len(course_list) 
@@ -208,6 +203,7 @@ def course_info():
     print(q)
     empList = []
     for emp in course_info:
+    	## TODO: replace below with subject, number, crn, title
         emp = (None, None, None, None) + emp
         empDict = {
             'subject': emp[0], 'number': emp[1], 'crn': emp[2], 'title': emp[3],
