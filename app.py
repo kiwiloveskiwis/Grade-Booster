@@ -229,13 +229,24 @@ def course_info():
 
     return json.dumps(empList)
 
+
 @app.route('/course')
 def course():
     subject = request.args.get('subject', None)
     number = request.args.get('number', None)
     title = request.args.get('title', None)
+    is_fav = False
 
-    return render_template('course_detail.html', subject=subject, number=number, title=title)
+    if 'user' in session:
+        q = """
+            SELECT *
+            FROM favorite 
+            where EMAIL = '{email}' AND COURSE_SUB = '{subject}' AND COURSE_NUM = '{number}'
+            """.format(email = session['user'], subject=subject, number=number)
+        data=get_data_from_sql(q)
+        if(data): is_fav = True
+        print(is_fav)
+    return render_template('course_detail.html', subject=subject, number=number, title=title, is_fav=is_fav)
 
 
 ############## Main ##############
