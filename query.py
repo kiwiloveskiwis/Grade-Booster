@@ -1,3 +1,6 @@
+def valid_course(sub, num):
+    return """SELECT 1 FROM course WHERE Subject='{}' AND Number='{}'""".format(sub, num)
+
 def get_subject(subject): # Group By
     return """  
         SELECT DISTINCT subject, number, MIN(title), ROUND(AVG(overall_gpa), 2) FROM course \

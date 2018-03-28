@@ -97,20 +97,32 @@ def fav_course():
     if 'user' not in session: flash('SIGN IN FIRST!', 'error'); return redirect('/')
     items = get_data_from_sql(query.get_favorite(session['user']))
     is_fav = [True] * len(items)
-    return render_template("tableview.html", pageType='account', items=items, is_fav=is_fav)
+    return render_template("tableview.html", pageType='account', items=items, is_fav=is_fav, edit=True)
 
 @app.route('/fav_course/add', )
 def insert_table():
+    print ('\nadd\n')
     if 'user' not in session: flash('SIGN IN FIRST!', 'error'); return redirect('/')
     sub = request.args.get('sub', default=None)
     num = request.args.get('num', default=None)
     print(sub, num)
-    replace_id = request.args.get('replace', default=None)
-    if(not replace_id): # insert
+    # replace_id = request.args.get('replace', default=None)
+    newsub = request.args.get('newsub', default=sub)
+    newnum = request.args.get('newnum', default=num)
+    # if(not replace_id): # insert
+    if not newsub or not newnum:
         q = query.insert_favorite(email=session['user'], course_sub=sub, course_num=num)
-    # else:
-    #     q = query.update_favorite(email=session['user'], old_course_sub=sub, old_course_num=num, new_course_id=course_id) # update
-    get_data_from_sql(q, commit=True)
+        get_data_from_sql(q, commit=True)
+    else:
+        print (sub,num, newsub,newnum)
+        q = query.valid_course(newsub, newnum)
+        q = get_data_from_sql(q)
+        print (q)
+        if q:
+            q = query.update_favorite(email=session['user'], old_course_sub=sub, old_course_num=num, new_course_sub=newsub, new_course_num=newnum) # update
+            get_data_from_sql(q, commit=True)
+        else:
+            flash('Invalid Course Subject or Number!', 'error');
     return redirect(request.referrer if request.referrer else '/fav_course')
 
 @app.route('/fav_course/del', )
@@ -197,7 +209,7 @@ def get_subject():
         is_fav = [(_[0],_[1]) in fav_list for _ in course_list]
     else:
         is_fav = [False] * len(course_list)
-    return render_template('tableview.html', items=course_list, is_fav=is_fav) 
+    return render_template('tableview.html', items=course_list, is_fav=is_fav, edit=False) 
  
 @app.route('/course_info')
 def course_info():
