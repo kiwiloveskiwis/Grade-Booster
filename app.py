@@ -62,7 +62,6 @@ def autocomplete():
 def search():
     search_q = request.args['q'].upper()
     parts = re.split('(\d.*)', search_q)
-    print(parts)
     try:
         if(len(parts) == 1): return redirect('/get_subject?subject=%s'%parts[0].strip())
         sbj, number = parts[0].strip(), parts[1].strip()
@@ -101,24 +100,18 @@ def fav_course():
 
 @app.route('/fav_course/add', )
 def insert_table():
-    print ('\nadd\n')
     if 'user' not in session: flash('SIGN IN FIRST!', 'error'); return redirect('/')
     sub = request.args.get('sub', default=None)
     num = request.args.get('num', default=None)
-    print(sub, num)
-    # replace_id = request.args.get('replace', default=None)
     newsub = request.args.get('newsub', default=None)
     newnum = request.args.get('newnum', default=None)
-    # if(not replace_id): # insert
-    if not newsub or not newnum:
+
+    if not newsub or not newnum: # Not Update => Insert
         q = query.insert_favorite(email=session['user'], course_sub=sub, course_num=num)
         get_data_from_sql(q, commit=True)
     else:
-        print (sub,num, newsub,newnum)
-        q = query.valid_course(newsub, newnum)
-        q = get_data_from_sql(q)
-        print (q)
-        if q:
+        isValid = get_data_from_sql(query.valid_course_not_in_fav(newsub, newnum, session['user']))
+        if isValid:
             q = query.update_favorite(email=session['user'], old_course_sub=sub, old_course_num=num, new_course_sub=newsub, new_course_num=newnum) # update
             get_data_from_sql(q, commit=True)
         else:
@@ -205,7 +198,6 @@ def get_subject():
 
     if 'user' in session:
         fav_list = { (_[0],_[1]) for _ in get_data_from_sql(query.get_favorite(session['user'])) }
-        # print (fav_list)
         is_fav = [(_[0],_[1]) in fav_list for _ in course_list]
     else:
         is_fav = [False] * len(course_list)
@@ -221,7 +213,7 @@ def course_info():
         SUM(dp), SUM(d), SUM(dm), SUM(f), SUM(w), instructor, semester FROM `raw` \
         WHERE subject = '%s' AND number = %s AND title LIKE '%s%%' GROUP BY semester, instructor" % (subject, number, title)
     course_info = get_data_from_sql(q)
-    print(course_info)
+    # print(course_info)
     empList = []
     for emp in course_info:
         empDict = {

@@ -1,5 +1,11 @@
-def valid_course(sub, num):
-    return """SELECT 1 FROM course WHERE Subject='{}' AND Number='{}'""".format(sub, num)
+def valid_course_not_in_fav(sub, num, email):
+    return """
+        SELECT True 
+        FROM course
+        WHERE Subject='{}' AND Number='{}' 
+        AND NOT EXISTS 
+        (SELECT True FROM favorite WHERE COURSE_SUB='{}' AND COURSE_NUM='{}' AND EMAIL='{}')
+    """.format(sub, num, sub, num, email)
 
 def get_subject(subject): # Group By
     return """  

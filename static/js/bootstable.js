@@ -26,9 +26,9 @@ Bootstable
 '<button id="bEdit" type="button" class="btn btn-sm btn-default" onclick="rowEdit(this);">' +
 '<span class="fas fa-pencil-alt" > </span>'+
 '</button>'+
-'<button id="bElim" type="button" class="btn btn-sm btn-default" onclick="rowElim(this);">' +
-'<span class="fas fa-trash-alt" > </span>'+
-'</button>'+
+// '<button id="bElim" type="button" class="btn btn-sm btn-default" onclick="rowElim(this);">' +
+// '<span class="fas fa-trash-alt" > </span>'+
+// '</button>'+
 '<button id="bAcep" type="button" class="btn btn-sm btn-default" style="display:none;" onclick="rowAcep(this);">' + 
 '<span class="fas fa-check" > </span>'+
 '</button>'+
