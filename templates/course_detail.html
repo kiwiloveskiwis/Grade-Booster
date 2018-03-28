@@ -2,7 +2,27 @@
 {% block body %}
 <div id="display">
 <script src="https://d3js.org/d3-scale-chromatic.v0.3.js"></script>
-<h2 class='text-center'> {{subject}} {{number}}:   {{title}} </h2>
+
+
+<h1 class='text-center'>
+  <span>{{subject}} {{number}}:   {{title}}</span>
+{% if is_fav %}
+<button id="bAddFav" type="button" class="btn btn-lg btn-default pull-right"
+onclick="location.href='/fav_course/del?sub={{subject}}&num={{number}}';">
+<span class="fas fa-star" style='color:#FFC300'> </span>
+</button>
+{% else %}
+<button id="bAddFav" type="button" class="btn btn-lg btn-default pull-right"
+onclick="location.href='/fav_course/add?sub={{subject}}&num={{number}}';">
+<span class="far fa-star"> </span>
+{% endif %}
+</h1>
+<hr/>
+
+
+
+
+</div>
 <script type="text/javascript">
 	var m = 40,
 	    r = 180,

@@ -89,16 +89,19 @@ def profile():
 #               True]
 #     return render_template("tableview.html", pageType='tableview', items=items, is_fav=is_fav)
 
-
 ####### Fav_course #######
+
 @app.route('/fav_course', methods=['GET'])
 def fav_course():
+    # check_user_login()
+    if 'user' not in session: flash('SIGN IN FIRST!', 'error'); return redirect('/')
     items = get_data_from_sql(query.get_favorite(session['user']))
     is_fav = [True] * len(items)
     return render_template("tableview.html", pageType='account', items=items, is_fav=is_fav)
 
 @app.route('/fav_course/add', )
 def insert_table():
+    if 'user' not in session: flash('SIGN IN FIRST!', 'error'); return redirect('/')
     sub = request.args.get('sub', default=None)
     num = request.args.get('num', default=None)
     print(sub, num)
@@ -112,6 +115,7 @@ def insert_table():
 
 @app.route('/fav_course/del', )
 def delete_table():
+    if 'user' not in session: flash('SIGN IN FIRST!', 'error'); return redirect('/')
     sub = request.args.get('sub', default=None)
     num = request.args.get('num', default=None)
     q = query.remove_favorite(email=session['user'], course_sub=sub, course_num=num)
@@ -188,8 +192,8 @@ def get_subject():
     subject = request.args.get('subject', None)
     course_list = get_data_from_sql(query.get_subject(subject))
 
-    if "user" in session:
-        fav_list = { (_[0],_[1]) for _ in get_data_from_sql(query.get_favorite(session["user"])) }
+    if 'user' in session:
+        fav_list = { (_[0],_[1]) for _ in get_data_from_sql(query.get_favorite(session['user'])) }
         # print (fav_list)
         is_fav = [(_[0],_[1]) in fav_list for _ in course_list]
     else:
@@ -227,8 +231,18 @@ def course():
     subject = request.args.get('subject', None)
     number = request.args.get('number', None)
     title = request.args.get('title', None)
+    is_fav = False
 
-    return render_template('course_detail.html', subject=subject, number=number, title=title)
+    if 'user' in session:
+        q = """
+            SELECT *
+            FROM favorite 
+            where EMAIL = '{email}' AND COURSE_SUB = '{subject}' AND COURSE_NUM = '{number}'
+            """.format(email = session['user'], subject=subject, number=number)
+        data=get_data_from_sql(q)
+        if(data): is_fav = True
+        print(is_fav)
+    return render_template('course_detail.html', subject=subject, number=number, title=title, is_fav=is_fav)
 
 
 ############## Main ##############
