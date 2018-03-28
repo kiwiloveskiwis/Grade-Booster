@@ -1,4 +1,4 @@
-CREATE DATABASE `baselessdata_db`;
+CREATE DATABASE `baselessdata_db` IF NOT Exists;
 
 CREATE TABLE IF NOT Exists `baselessdata_db`.tbl_user (
     email VARCHAR(100),

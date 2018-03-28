@@ -196,15 +196,13 @@ def course_info():
     number = request.args.get('number', None)
     title = request.args.get('title', None)
 
-    q = "SELECT SUM(ap), SUM(a), SUM(am), SUM(bp), SUM(b), SUM(bm), SUM(cp), SUM(c), SUM(cm), \
+    q = "SELECT MIN(subject), min(number), min(crn), min(title), SUM(ap), SUM(a), SUM(am), SUM(bp), SUM(b), SUM(bm), SUM(cp), SUM(c), SUM(cm), \
         SUM(dp), SUM(d), SUM(dm), SUM(f), SUM(w), instructor, semester FROM `raw` \
         WHERE subject = '%s' AND number = %s AND title LIKE '%s%%' GROUP BY semester, instructor" % (subject, number, title)
     course_info = get_data_from_sql(q)
-    print(q)
+    print(course_info)
     empList = []
     for emp in course_info:
-    	## TODO: replace below with subject, number, crn, title
-        emp = (None, None, None, None) + emp
         empDict = {
             'subject': emp[0], 'number': emp[1], 'crn': emp[2], 'title': emp[3],
             'ap': emp[4], 'a': emp[5], 'am': emp[6], 

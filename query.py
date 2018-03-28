@@ -1,18 +1,18 @@
 def get_subject(subject): # Group By
     return """  
-        SELECT DISTINCT subject, number, title, ROUND(AVG(overall_gpa), 2) FROM course \
+        SELECT DISTINCT subject, number, MIN(title), ROUND(AVG(overall_gpa), 2) FROM course \
         WHERE subject='{subject}' \
-        GROUP BY subject, number, title
+        GROUP BY subject, number
         ;
     """.format(subject = subject)
 
 
-def get_favorite(email): # Natural join 
+def get_favorite(email): # join 
     return """
         SELECT favorite.course_sub, favorite.course_num, course.title, course.overall_gpa
-        FROM course, favorite 
-        WHERE favorite.EMAIL = '{email}' AND favorite.COURSE_SUB = course.Subject \
-            AND favorite.COURSE_NUM = course.NUMBER
+        FROM favorite INNER JOIN course ON 
+        favorite.COURSE_SUB = course.Subject AND favorite.COURSE_NUM = course.NUMBER
+        where favorite.EMAIL = '{email}' 
         ;
     """.format(email = email)
 
