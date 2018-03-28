@@ -164,7 +164,8 @@ def signUp():
                 flash('Why come back? Nothing has been updated.', 'success')
         else: error = 'FILL OUT THE FORMS!' # Not used here: js already checked required fields
 
-        if (error): flash(error, 'error')
+        if (error): 
+            flash(error, 'error')
         else:
             session['user'] = _email
             session['uname'] = _email.split("@")[0]
@@ -242,8 +243,18 @@ def course():
     subject = request.args.get('subject', None)
     number = request.args.get('number', None)
     title = request.args.get('title', None)
+    is_fav = False
 
-    return render_template('course_detail.html', subject=subject, number=number, title=title)
+    if 'user' in session:
+        q = """
+            SELECT *
+            FROM favorite 
+            where EMAIL = '{email}' AND COURSE_SUB = '{subject}' AND COURSE_NUM = '{number}'
+            """.format(email = session['user'], subject=subject, number=number)
+        data=get_data_from_sql(q)
+        if(data): is_fav = True
+        print(is_fav)
+    return render_template('course_detail.html', subject=subject, number=number, title=title, is_fav=is_fav)
 
 
 ############## Main ##############
