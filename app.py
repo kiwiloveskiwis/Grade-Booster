@@ -107,8 +107,8 @@ def insert_table():
     num = request.args.get('num', default=None)
     print(sub, num)
     # replace_id = request.args.get('replace', default=None)
-    newsub = request.args.get('newsub', default=sub)
-    newnum = request.args.get('newnum', default=num)
+    newsub = request.args.get('newsub', default=None)
+    newnum = request.args.get('newnum', default=None)
     # if(not replace_id): # insert
     if not newsub or not newnum:
         q = query.insert_favorite(email=session['user'], course_sub=sub, course_num=num)
@@ -164,8 +164,7 @@ def signUp():
                 flash('Why come back? Nothing has been updated.', 'success')
         else: error = 'FILL OUT THE FORMS!' # Not used here: js already checked required fields
 
-        if (error): 
-            flash(error, 'error')
+        if (error): flash(error, 'error')
         else:
             session['user'] = _email
             session['uname'] = _email.split("@")[0]
@@ -243,18 +242,8 @@ def course():
     subject = request.args.get('subject', None)
     number = request.args.get('number', None)
     title = request.args.get('title', None)
-    is_fav = False
 
-    if 'user' in session:
-        q = """
-            SELECT *
-            FROM favorite 
-            where EMAIL = '{email}' AND COURSE_SUB = '{subject}' AND COURSE_NUM = '{number}'
-            """.format(email = session['user'], subject=subject, number=number)
-        data=get_data_from_sql(q)
-        if(data): is_fav = True
-        print(is_fav)
-    return render_template('course_detail.html', subject=subject, number=number, title=title, is_fav=is_fav)
+    return render_template('course_detail.html', subject=subject, number=number, title=title)
 
 
 ############## Main ##############
