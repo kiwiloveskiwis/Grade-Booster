@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html> <!--<![endif]-->
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+        <meta charset="utf-8">
+        <!-- <title><?php echo $config['title']; ?></title> -->
+        <title>Demo Title</title>
+        <link rel="stylesheet" href="static/stylesheets/css/bootstrap.css">
+        <link rel="stylesheet" href="static/stylesheets/css/style.css">
+        <link rel="stylesheet" href="static/stylesheets/css/svg.css">
+    </head>
+    <body>
+        <!--[if lt IE 9]>
+        <div class="unsupported-browser">
+            This website does not fully support your browser.  Please get a
+            better browser (Firefox or <a href="/chrome/">Chrome</a>, or if you
+            must use Internet Explorer, make it version 9 or greater).
+        </div>
+        <![endif]-->
+        <div id="split-container">
+            <a class="btn btn-default nav-button" id="nav-list" href="/">
+                View list
+            </a>
+            <div id="graph-container">
+                <div id="graph"></div>
+            </div>
+            <div id="docs-container">
+                <a id="docs-close" href="#">&times;</a>
+                <div id="docs" class="docs"></div>
+            </div>
+        </div>
+        <script>
+            var config = {{ json_data | safe }};
+            // var config;
+            // let p = fetch("/graph_config")
+            //     .then(data => data.json())
+            //     .then(json => {console.log(json); config = json;});
+            // console.log(p)
+        </script>
+        <script src="static/js/jquery/jquery-1.10.2.min.js"></script>
+        <script src="static/js/jquery/jquery.browser.min.js"></script>
+        <script src="static/js/d3/d3.v3.min.js"></script>
+        <script src="static/js/colorbrewer.js"></script>
+        <script src="static/js/lib/geometry.js"></script>
+        <script src="static/js/script.js"></script>
+    </body>
+</html>

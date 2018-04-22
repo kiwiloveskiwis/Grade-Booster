@@ -249,6 +249,20 @@ def course():
     return render_template('course_detail.html', subject=subject, number=number, title=title, is_fav=is_fav)
 
 
+
+@app.route('/graph')
+def graph():
+    json_data = json.load(open('static/config.json','r'))
+    json_data = json.dumps(json_data)
+    # print (json_data)
+    # json_data = jsonify(json_data)
+    return render_template("graph.html", pageType='graph', json_data=json_data)
+
+@app.route('/graph_objects')
+def graph_objects():
+    json_data = json.load(open('static/objects.json','r'))
+    return jsonify(json_data)
+
 ############## Main ##############
 
 @app.route('/')
