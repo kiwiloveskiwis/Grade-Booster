@@ -23,6 +23,9 @@ onclick="location.href='/fav_course/add?sub={{subject}}&num={{number}}';">
 
 
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.7.1/d3-tip.min.js"></script>
+
 <script type="text/javascript">
 	var m = 40,
 	    r = 180,
@@ -36,6 +39,9 @@ onclick="location.href='/fav_course/add?sub={{subject}}&num={{number}}';">
 	    grades = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"];
 
 	var pie = d3.pie().sort(null);
+
+    var tip = d3.tip()
+				.attr('class', 'd3-tip');
 
 	var arc = d3.arc()
 				.innerRadius(3 * r / 4)
@@ -90,6 +96,8 @@ onclick="location.href='/fav_course/add?sub={{subject}}&num={{number}}';">
                    		return Math.ceil(data.length / n_col) * 2 * (r + m);
                    });
 
+		svg.call(tip);
+
         var g_outer = svg.selectAll("g")
         				.data(data)
 	                    .enter()
@@ -114,9 +122,16 @@ onclick="location.href='/fav_course/add?sub={{subject}}&num={{number}}';">
 	        		return d.instructor;
 	        	});
 
+	    g_outer.attr("total", function(d) {
+			return d["ap"] + d["a"] + d["am"] +
+	    			d["bp"] + d["b"] + d["bm"] +
+	    			d["cp"] + d["c"] + d["cm"] +
+	    			d["dp"] + d["d"] + d["dm"] +
+	    			d["f"];
+	    });
 
-        var pies = g_outer.selectAll("g")
-        				.data(function(d, i) { 
+        var pies = g_outer.selectAll("path")
+        				.data(function(d) { 
 		                    return pie([d["ap"], d["a"], d["am"],
 		                    			d["bp"], d["b"], d["bm"],
 		                    			d["cp"], d["c"], d["cm"],
@@ -124,12 +139,17 @@ onclick="location.href='/fav_course/add?sub={{subject}}&num={{number}}';">
 		                    			d["f"]]); 
 	                    })
 	                    .enter()
-	                    .append("g");
-
-	   	pies.append("path")
-	       .attr("d", arc)
-	       .style("fill", function(d, i) { return z[i]; });
-	                     
+	                    .append("path")
+				        .attr("d", arc)
+				        .style("fill", function(d, i) { return z[i]; })
+				        .on('mouseover', function(d, i) {
+				        	var total = d3.select(this.parentNode).attr('total');
+				        	tip.html("<div><strong>Total enrollment: </strong>" + total + "</div>" + 
+									"<div><strong>Number of " + grades[i] + "'s: </strong>" + d.value + "</div>" +
+									"<div><strong>Percentage: </strong>" + (d.value / total * 100).toFixed(2) + "%</div>")
+				        		.show();
+				        })
+      	    			.on('mouseout', tip.hide);
 	})
 </script>
 </div>
