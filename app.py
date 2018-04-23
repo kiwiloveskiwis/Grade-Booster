@@ -65,10 +65,9 @@ def search():
     try:
         if(len(parts) == 1): return redirect('/get_subject?subject=%s'%parts[0].strip())
         sbj, number = parts[0].strip(), parts[1].strip()
-        course_info = get_data_from_sql(query.aggregate_sections_grade(sbj, number))
     except:
         course_info=None
-    return render_template("course_info.html", pageType='other', course_info=course_info)
+    return redirect('/course?subject=%s&number=%s'%(sbj, number))
 
 @app.route('/explore')
 def explore():
@@ -77,16 +76,6 @@ def explore():
 @app.route('/profile', methods=['POST', 'GET'])
 def profile():
     return render_template("profile.html", pageType='account')
-
-# Just for testing
-# @app.route('/tableview')
-# def tableview():
-#     # Subject, Number, Title, GPA,
-#     items = [['CS', '411', 'Database', '4.0'],
-#              ['CS', '412', 'Introduction to Data Mining', '4.0']]
-#     is_fav = [False,
-#               True]
-#     return render_template("tableview.html", pageType='tableview', items=items, is_fav=is_fav)
 
 ####### Fav_course #######
 
@@ -174,7 +163,7 @@ def signOut():
 
 
 ############## End of SignUp ############
-
+############## Course information ############
 
 @app.route('/getall')
 def getall():
@@ -211,7 +200,7 @@ def course_info():
 
     q = "SELECT MIN(subject), min(number), min(crn), min(title), SUM(ap), SUM(a), SUM(am), SUM(bp), SUM(b), SUM(bm), SUM(cp), SUM(c), SUM(cm), \
         SUM(dp), SUM(d), SUM(dm), SUM(f), SUM(w), instructor, semester FROM `raw` \
-        WHERE subject = '%s' AND number = %s AND title LIKE '%s%%' GROUP BY semester, instructor" % (subject, number, title)
+        WHERE subject = '%s' AND number = %s  GROUP BY semester, instructor" % (subject, number)
     course_info = get_data_from_sql(q)
     # print(course_info)
     empList = []
@@ -234,7 +223,8 @@ def course_info():
 def course():
     subject = request.args.get('subject', None)
     number = request.args.get('number', None)
-    title = request.args.get('title', None)
+    title = request.args.get('title', \
+         get_data_from_sql(query.find_course_instructor(subject, number))[0][0])
     is_fav = False
 
     if 'user' in session:
@@ -248,7 +238,7 @@ def course():
         print(is_fav)
     return render_template('course_detail.html', subject=subject, number=number, title=title, is_fav=is_fav)
 
-
+############## Bipartite Graph ##############
 
 @app.route('/graph')
 def graph():

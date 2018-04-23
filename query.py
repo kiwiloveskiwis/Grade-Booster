@@ -49,14 +49,22 @@ def remove_favorite(email, course_sub, course_num):
         WHERE EMAIL = '{email}' AND COURSE_SUB = '{course_sub}' AND COURSE_NUM = '{course_num}'
     """.format(email=email, course_sub=course_sub, course_num=course_num)
 
-def aggregate_sections_grade(subject_name, subject_number): # Group By
+# def aggregate_sections_grade(subject_name, subject_number): # Group By
+#     return """
+#         SELECT SUM(ap) as ap, SUM(a) as a, SUM(am) as am, SUM(bp) as bp, SUM(b) as b, \
+#                SUM(bm) as bm, SUM(cp) as cp, SUM(c) as c, SUM(cm) as cm, SUM(dp) as dp, \
+#                SUM(d) as d, SUM(dm) as dm, SUM(f) as f, SUM(w) as w, instructor, semester\
+#         FROM raw
+#         WHERE `subject`='{subject_name}' AND number='{subject_number}'
+#         GROUP BY instructor, semester, `subject`, number
+#     """.format(subject_name = subject_name, subject_number = subject_number)
+
+def find_course_instructor(subject_name, subject_number):
     return """
-        SELECT SUM(ap) as ap, SUM(a) as a, SUM(am) as am, SUM(bp) as bp, SUM(b) as b, \
-               SUM(bm) as bm, SUM(cp) as cp, SUM(c) as c, SUM(cm) as cm, SUM(dp) as dp, \
-               SUM(d) as d, SUM(dm) as dm, SUM(f) as f, SUM(w) as w, instructor, semester\
+        SELECT MIN(title) # A simplification
         FROM raw
-        WHERE `subject`='CS' AND number='411'
-        GROUP BY instructor, semester, `subject`, number
+        WHERE `subject`='{subject_name}' AND number='{subject_number}'
+        GROUP BY `subject`, `number`
     """.format(subject_name = subject_name, subject_number = subject_number)
 
 def advance_fun2(data):
