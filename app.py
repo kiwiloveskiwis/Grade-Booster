@@ -1,6 +1,7 @@
 from flask import Flask, Response, render_template, json, request, redirect, abort, session, jsonify, flash
 from flaskext.mysql import MySQL
-import json, sys
+import simplejson as json
+import sys
 from werkzeug import generate_password_hash, check_password_hash
 from flask_sslify import SSLify
 import re
@@ -11,31 +12,35 @@ mysql = MySQL()
 app = Flask(__name__)
 ac_cache = None
 
-# MySQL configurations
+# # MySQL configurations
 if "yuanyiz2" in __file__:
     app.config['MYSQL_DATABASE_USER'] = 'yuanyiz2_root'
     app.config['MYSQL_DATABASE_PASSWORD'] = '12345root'
     app.config['MYSQL_DATABASE_DB'] = 'yuanyiz2_baseless'
-else:
-# if(sys.platform == 'linux' or sys.platform == 'darwin'):
+    app.config['SECRET_KEY'] = 'whatever'
+elif(sys.platform == 'linux' or sys.platform == 'darwin'):
     app.config['MYSQL_DATABASE_USER'] = 'root'
     app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
     app.config['MYSQL_DATABASE_DB'] = 'baselessdata_db'
-    sslify = SSLify(app)
-
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-app.config['SECRET_KEY'] = 'whatever'
+    app.config['SECRET_KEY'] = 'whatever'
+    SSLify(app)
+# else:
+#     app.config['MYSQL_DATABASE_USER'] = 'tianyu'
+#     app.config['MYSQL_DATABASE_PASSWORD'] = '515253'
+#     app.config['MYSQL_DATABASE_DB'] = 'project'
+#     app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
 mysql.init_app(app)
 
 
-def get_data_from_sql(q):
-    conn = mysql.connect(); cur = conn.cursor()
+def get_data_from_sql(q, commit=False):
+    conn = mysql.get_db(); 
+    cur = conn.cursor()
     if(type(q) == str): cur.execute(q)
     else: cur.execute(q[0], q[1:])
 
     data = cur.fetchall()
-    conn.close(); cur.close()
+    if(commit): conn.commit()
     return data
 
 @app.route('/autocomplete', methods=['GET', 'POST'])
@@ -60,10 +65,7 @@ def search():
     try:
         sbj, number = parts[0].strip(), parts[1].strip()
         print("You just searched", sbj, number)
-        # q = ["SELECT * FROM `raw` WHERE subject = (%s) AND number = (%s)", sbj, number]
-        # print(q)
         course_info = get_data_from_sql(query.aggregate_sections_grade(sbj, number))
-        print(course_info)
     except:
         course_info=None
     return render_template("course_info.html", pageType='other', course_info=course_info)
@@ -84,34 +86,35 @@ def tableview():
              ['CS', '412', 'Introduction to Data Mining', '4.0']]
     is_fav = [False,
               True]
-    # is_fav = ['False',
-    #           'True']
     return render_template("tableview.html", pageType='tableview', items=items, is_fav=is_fav)
 
 
 ####### Fav_course #######
-@app.route('/fav_course', methods=['POST', 'GET'])
+@app.route('/fav_course', methods=['GET'])
 def fav_course():
-    # TODO: replace below with actual db search
-    items = [['CS', '411', '4.0']]
-    # cur = g.db.execute('select title, text from entries order by id desc')
-    # items = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
-    return render_template("fav_course.html", pageType='account', items=items)
+    ## TODO: replace below with a more complicated sql query
+    ## intersect, etc.
+    q = query.get_favorite(session['user'])
+    items = get_data_from_sql(q) # (('CS411', 0), ('Math540', 0), (...))
+    items = [re.split('(\d.*)', item[0]) for item in items] 
+    is_fav = [True] * len(items)
+    return render_template("tableview.html", pageType='account', items=items, is_fav=is_fav)
 
 @app.route('/fav_course/add/<course_id>', )
 def insert_table(course_id):
     replace_id = request.args.get('replace', default=None)
-    cursor = mysql.get_db().cursor()
     if(not replace_id): # insert
-        query.insert_favorite(email=session['user'], course_id=course_id)
+        q = query.insert_favorite(email=session['user'], course_id=course_id)
     else:
-        query.update_favorite(email=session['user'], old_course_id=replace_id, new_course_id=course_id) # update
+        q = query.update_favorite(email=session['user'], old_course_id=replace_id, new_course_id=course_id) # update
 
+    get_data_from_sql(q, commit=True)
     return redirect('/fav_course')
 
 @app.route('/fav_course/del/<course_id>', )
 def delete_table(course_id):
-    query.remove_favorite(email=session['user'], course_id=course_id)
+    q = query.remove_favorite(email=session['user'], course_id=course_id)
+    get_data_from_sql(q, commit=True)
     return redirect('/fav_course')
 
 
@@ -121,12 +124,12 @@ def delete_table(course_id):
 def signUp():
     _email = request.form['email']
     _password = request.form['password']
-    cur, conn = None, None
     error = None
     try:
         # validate the received values
         if _email and _password:
-            cur = mysql.get_db().cursor()
+            conn = mysql.get_db()
+            cur = conn.cursor()
             # check user existence first
             q = "SELECT * FROM tbl_user WHERE email=\"{}\";".format(_email)
             cur.execute(q)
@@ -134,8 +137,6 @@ def signUp():
 
             if len(data) == 0: # user not exist: consider as sign up
                 _hashed_password = generate_password_hash(_password)
-                # print (_hashed_password)
-
                 cur.callproc('sp_createUser', (_email, _hashed_password))
                 conn.commit()
                 flash('Ohhh poor little guy that strays!', 'success')
@@ -158,17 +159,13 @@ def signUp():
 
 @app.route('/signOut')
 def signOut():
-    # if 'user' not in session:
-    #     return redirect(url_for('signin'))
     session.pop('user', None)
     return redirect('/')
-    # return render_template('index.html', pageType='index')
 
 @app.route('/getall')
 def getall():
-    cursor = mysql.connect().cursor()
-    cursor.execute("SELECT subject, ROUND(AVG(overall_gpa), 2) as avg_gpa FROM course GROUP BY subject")
-    data = cursor.fetchall()
+    q = "SELECT subject, ROUND(AVG(overall_gpa), 2) as avg_gpa FROM course GROUP BY subject"
+    data = get_data_from_sql(q)
 
     empList = []
     for emp in data:
@@ -184,11 +181,48 @@ def getall():
 def get_subject():
     subject = request.args.get('subject', None)
 
-    cursor = mysql.connect().cursor()
-    cursor.execute("SELECT * FROM course WHERE subject= %s", subject)
-    course_list = cursor.fetchall()
+    # return render_template('course_list.html', course_list=course_list)
+    q = ["SELECT DISTINCT subject, number, title FROM raw WHERE subject=%s ORDER BY number", subject]
+    course_list = get_data_from_sql(q)
 
-    return render_template('course.html', course_list=course_list)
+    # print ("course_list")
+    is_fav = [False] * len(course_list)
+    return render_template('tableview.html', items=course_list, is_fav=is_fav) 
+ 
+@app.route('/course_info')
+def course_info():
+    subject = request.args.get('subject', None)
+    number = request.args.get('number', None)
+    title = request.args.get('title', None)
+
+    q = "SELECT SUM(ap), SUM(a), SUM(am), SUM(bp), SUM(b), SUM(bm), SUM(cp), SUM(c), SUM(cm), \
+        SUM(dp), SUM(d), SUM(dm), SUM(f), SUM(w), instructor, semester FROM `raw` \
+        WHERE subject = '%s' AND number = %s AND title LIKE '%s%%' GROUP BY semester, instructor" % (subject, number, title)
+    course_info = get_data_from_sql(q)
+    print(q)
+    empList = []
+    for emp in course_info:
+        emp = (None, None, None, None) + emp
+        empDict = {
+            'subject': emp[0], 'number': emp[1], 'crn': emp[2], 'title': emp[3],
+            'ap': emp[4], 'a': emp[5], 'am': emp[6], 
+            'bp': emp[7], 'b': emp[8], 'bm': emp[9],
+            'cp': emp[10], 'c': emp[11], 'cm': emp[12],
+            'dp': emp[13], 'd': emp[14], 'dm': emp[15], 
+            'f': emp[16], 'w': emp[17],
+            'instructor': emp[18], 'semester': emp[19]
+        }
+        empList.append(empDict)
+
+    return json.dumps(empList)
+
+@app.route('/course')
+def course():
+    subject = request.args.get('subject', None)
+    number = request.args.get('number', None)
+    title = request.args.get('title', None)
+
+    return render_template('course_detail.html', subject=subject, number=number, title=title)
 
 @app.route('/')
 def main():

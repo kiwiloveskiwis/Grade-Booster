@@ -1,0 +1,116 @@
+{% extends "index.html" %}
+{% block body %}
+<div id="display">
+<script src="https://d3js.org/d3-scale-chromatic.v0.3.js"></script>
+<script type="text/javascript">
+	var m = 40,
+	    r = 180,
+	    z = [d3.rgb(0, 153, 255, 0.8), d3.rgb(77, 184, 255, 0.8), d3.rgb(153, 214, 255, 0.8),
+	    	 d3.rgb(51, 204, 51, 0.8), d3.rgb(112, 219, 112, 0.8), d3.rgb(173, 235, 173, 0.8),
+	    	 d3.rgb(255, 153, 0, 0.8), d3.rgb(255, 184, 77, 0.8), d3.rgb(255, 214, 153, 0.8),
+	    	 d3.rgb(255, 92, 51, 0.8), d3.rgb(255, 153, 128, 0.8), d3.rgb(255, 214, 204, 0.8),
+	    	 d3.rgb(255, 153, 255, 0.8)];
+	    n_col = 2;
+	    width = 920,
+	    grades = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"];
+
+	var pie = d3.pie().sort(null);
+
+	var arc = d3.arc()
+				.innerRadius(3 * r / 4)
+				.outerRadius(r);
+
+	var legend = d3.select("#display")
+		.append("svg")
+        .attr("width", width)
+        .attr("height", 30)
+        .selectAll("g")
+        .data(z)
+    	.enter()    
+    		.append("g")
+    		.attr("transform", function(d, i) {
+    			return "translate(" + (200 + i * 43) + ", 0)"; 
+    		});
+
+    	legend.append("rect")
+	    	.attr("height", 8)
+	    	.attr("width", 40)
+			.attr("fill", function(d, i) { return z[i]; });
+
+		legend.append("text")
+			.text(function(d, i) { return grades[i]; })
+			.attr("fill", "black")
+			.attr("dy", 25)
+			.attr("dx", 20)
+            .style("text-anchor", "middle");
+
+	d3.json("/course_info?subject={{subject}}&number={{number}}&title={{title}}", function(error, data) {
+		data.forEach(function(d) {
+            d.ap = +d.ap;
+            d.a = +d.a;
+            d.am = +d.am;
+            d.bp = +d.bp;
+            d.b = +d.b;
+            d.bm = +d.bm;
+            d.cp = +d.cp;
+            d.c = +d.c;
+            d.cm = +d.cm;
+            d.dp = +d.dp;
+            d.d = +d.d;
+            d.dm = +d.dm;
+            d.f = +d.f;
+            d.w = +d.w;
+        });
+
+		var svg = d3.select("#display")
+                   .append("svg")
+                   .attr("width", width)
+                   .attr("height", function(d) {
+                   		return Math.ceil(data.length / n_col) * 2 * (r + m);
+                   });
+
+        var g_outer = svg.selectAll("g")
+        				.data(data)
+	                    .enter()
+                        .append("g")
+                        .attr("transform", function(d, i) {
+                        	return "translate(" + ((r + m) * (2 * (i % n_col) + 1)) + ","
+                        			 + ((r + m) * (2 * Math.floor(i / n_col) + 1)) + ")";
+                        });
+
+        g_outer.append("text")
+	        	.style("text-anchor", "middle")
+	        	.append("tspan")
+	        	.attr('x', 0)
+  				.attr('dy', 0)
+	        	.text(function(d) {
+	        		return d.semester;
+	        	})
+	        	.append("tspan")
+	        	.attr('x', 0)
+ 				.attr('dy', "1.2em")
+	        	.text(function(d) {
+	        		return d.instructor;
+	        	});
+
+
+        var pies = g_outer.selectAll("g")
+        				.data(function(d, i) { 
+		                    return pie([d["ap"], d["a"], d["am"],
+		                    			d["bp"], d["b"], d["bm"],
+		                    			d["cp"], d["c"], d["cm"],
+		                    			d["dp"], d["d"], d["dm"],
+		                    			d["f"]]); 
+	                    })
+	                    .enter()
+	                    .append("g");
+
+	   	pies.append("path")
+	       .attr("d", arc)
+	       .style("fill", function(d, i) { return z[i]; });
+	                     
+	})
+</script>
+</div>
+
+{% endblock %}

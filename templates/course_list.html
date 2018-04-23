@@ -4,10 +4,10 @@
 			<div class="list-group">
 				{% for course in course_list %}
 				
-				<a class="list-group-item">
-				    <h4>{{ course[0] }} {{ course[1] }}: {{ course[2] }}</h4>
+				<div class="list-group-item">
+				    <h4><a href="/course?subject={{course[0]}}&number={{course[1]}}&title={{course[2]}}">{{ course[0] }} {{ course[1] }}: {{ course[2] }}</a></h4>
 				    <p>Average GPA: {{ course[3] }}</p>
-			  	</a>
+			  	</div>
 
 			  	{% endfor %}
 			</div>
