@@ -4,6 +4,8 @@ body {
   padding-bottom: 20px;
 }
 
+
+
 /* Everything but the jumbotron gets side spacing for mobile first views */
 .header,
 .marketing,
@@ -149,4 +151,14 @@ li.ui-state-focus{
       -webkit-border-radius: 0px;
       -moz-border-radius: 0px;
       background-image: none;
+}
+
+
+.mysquare {
+    background: #000;
+    width: 50vw;
+    height: 50vw;
+}
+.mysquare h1 {
+    color: #ff0;
 }

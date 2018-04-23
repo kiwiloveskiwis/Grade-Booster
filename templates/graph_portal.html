@@ -1,0 +1,11 @@
+{% extends "index.html" %}
+{% set active_page = "explore" %}
+{% block body %}
+ <body>
+ 	<div class="text-center">
+	<iframe src='/graph' onload="autoResize(this)" height="500px" width="100%"
+	  frameborder="0">
+	</iframe>
+</div>
+</body>
+{% endblock %}
