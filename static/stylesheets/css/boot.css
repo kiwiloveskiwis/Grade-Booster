@@ -152,13 +152,3 @@ li.ui-state-focus{
       -moz-border-radius: 0px;
       background-image: none;
 }
-
-
-.mysquare {
-    background: #000;
-    width: 50vw;
-    height: 50vw;
-}
-.mysquare h1 {
-    color: #ff0;
-}
