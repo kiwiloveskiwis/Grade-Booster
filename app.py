@@ -260,19 +260,12 @@ def graph():
 
 @app.route('/graph_objects')
 def graph_objects():
-    # json_data = json.load(open('static/objects.json','r'))
-    # return jsonify(json_data)
 
-    inst2course = {}
-    inst2course['aaa'] = ['A', 'AB', 'AAA'];
-    inst2course['bbb'] = ['B', 'AB', 'BBB'];
-    course2inst = {}
-    course2inst['A'] = ['aaa'];
-    course2inst['B'] = ['bbb'];
-    course2inst['AB'] = ['aaa', 'bbb'];
-    course2inst['AAA'] = ['aaa'];
-    course2inst['BBB'] = ['bbb'];
-
+    course_info = get_data_from_sql("""SELECT DISTINCT instructor, subject, number 
+        from raw 
+        WHERE subject="CS" AND instructor is not Null 
+        """)
+    inst2course, course2inst = query.advance_fun2(course_info)
     d = { 'data': {}, 'errors': [] }
     for inst,course in inst2course.items():
         d['data'][inst] = {
@@ -282,7 +275,6 @@ def graph_objects():
             'dependedOnBy': [],
             'docs': 'Sounds good...'
         }
-        # for c in course:
     for course,inst in course2inst.items():
         d['data'][course] = {
             'name': course,
@@ -291,7 +283,6 @@ def graph_objects():
             'dependedOnBy': inst,
             'docs': 'Sounds Good...'
         }
-
     return json.dumps(d)
 
 ############## Main ##############

@@ -1,3 +1,5 @@
+import json
+
 def valid_course_not_in_fav(sub, num, email):
     return """
         SELECT True 
@@ -56,3 +58,11 @@ def aggregate_sections_grade(subject_name, subject_number): # Group By
         WHERE `subject`='CS' AND number='411'
         GROUP BY instructor, semester, `subject`, number
     """.format(subject_name = subject_name, subject_number = subject_number)
+
+def advance_fun2(data):
+    data = [(i[0], "{}{}".format(*i[1:])) for i in data]
+    i2c, c2i = {}, {}
+    for i, c in data:
+        i2c[i] = i2c.get(i, []) + [c]
+        c2i[c] = c2i.get(c, []) + [i]
+    return i2c, c2i

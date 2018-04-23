@@ -1,10 +1,10 @@
 {
     "title": "Les Miserables characters",
     "graph": {
-        "linkDistance": 150,
-        "charge": -400,
-        "height": 500,
-        "numColors": 12,
+        "linkDistance": 100,
+        "charge": -200,
+        "height": 800,
+        "numColors": 3,
         "labelPadding": {
             "left": 3,
             "right": 3,

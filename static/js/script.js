@@ -120,7 +120,7 @@ function drawGraph() {
     }
     graph.categoryKeys = d3.keys(graph.categories);
 
-    graph.colors = colorbrewer.Set3[config.graph.numColors];
+    graph.colors = colorbrewer.Mine[config.graph.numColors];
 
     function getColorScale(darkness) {
         return d3.scale.ordinal()
@@ -563,7 +563,7 @@ function selectObject(obj, el) {
     node.classed('selected', true);
     $('#docs').html(obj.docs);
     $('#docs-container').scrollTop(0);
-    resize(true);
+    // resize(true);
 
     var $graph   = $('#graph-container'),
         nodeRect = {
