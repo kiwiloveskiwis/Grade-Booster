@@ -258,10 +258,6 @@ def graph():
     # json_data = jsonify(json_data)
     return render_template("graph.html", pageType='graph', json_data=json_data)
 
-@app.route('/graph_portal')
-def graph_portal():
-    return render_template("graph_portal.html", pageType='graph')
-
 @app.route('/graph_objects')
 def graph_objects():
     # json_data = json.load(open('static/objects.json','r'))
