@@ -17,10 +17,10 @@ prof2doc = {}
 def retrieve_ratemyprofessor(prof):
     if prof in prof2doc: return prof2doc[prof]
 
-    search_string = prof.replace(', ','+').replace(' ','+') + '+uiuc'
-    # print (search_string)
+    search_string = '+'.join(prof.replace(',','').split(' ')[:2]) + '+uiuc'
+    print (search_string)
 
-    site= "http://www.ratemyprofessors.com/search.jsp?query=%s" % search_string
+    site= "https://www.ratemyprofessors.com/search.jsp?query=%s" % search_string
     hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
            'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
@@ -31,7 +31,7 @@ def retrieve_ratemyprofessor(prof):
     req = urllib.request.Request(site, headers=hdr)
 
     # url = 'http://www.google.com/search?q=' + search_string
-    url = 'http://www.bing.com/search?q=' + search_string
+    url = 'https://www.bing.com/search?q=' + search_string
 
     try:
         page = urllib.request.urlopen(req)
@@ -43,7 +43,7 @@ def retrieve_ratemyprofessor(prof):
 
         li = tree.xpath('//li[@class="listing PROFESSOR"]')
         p = li[0]
-        url = 'http://www.ratemyprofessors.com' + p[0].get('href')
+        url = 'https://www.ratemyprofessors.com' + p[0].get('href')
     except:
         print ('error', prof)
         
@@ -243,6 +243,9 @@ def course_info():
     subject = request.args.get('subject', None)
     number = request.args.get('number', None)
     title = request.args.get('title', None)
+    if(not title and len(get_data_from_sql(query.find_course_instructor(subject, number)))>0): 
+        title = get_data_from_sql(query.find_course_instructor(subject, number))[0][0]
+    is_fav = False
 
     q = "SELECT MIN(subject), min(number), min(crn), min(title), SUM(ap), SUM(a), SUM(am), SUM(bp), SUM(b), SUM(bm), SUM(cp), SUM(c), SUM(cm), \
         SUM(dp), SUM(d), SUM(dm), SUM(f), SUM(w), instructor, semester FROM `raw` \
