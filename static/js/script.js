@@ -563,7 +563,7 @@ function selectObject(obj, el) {
     node.classed('selected', true);
     $('#docs').html(obj.docs);
     $('#docs-container').scrollTop(0);
-    // resize(true);
+    resize(true);
 
     var $graph   = $('#graph-container'),
         nodeRect = {
