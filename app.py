@@ -108,11 +108,12 @@ def autocomplete():
 def search():
     search_q = request.args['q'].upper()
     parts = re.split('(\d.*)', search_q)
-    try:
+    try: # search for a subject
         if(len(parts) == 1): return redirect('/get_subject?subject=%s'%parts[0].strip())
         sbj, number = parts[0].strip(), parts[1].strip()
     except:
         course_info=None
+    # otherwise, search for a course
     return redirect('/course?subject=%s&number=%s'%(sbj, number))
 
 @app.route('/explore')
@@ -242,9 +243,6 @@ def get_subject():
 def course_info():
     subject = request.args.get('subject', None)
     number = request.args.get('number', None)
-    title = request.args.get('title', None)
-    if(not title and len(get_data_from_sql(query.find_course_instructor(subject, number)))>0): 
-        title = get_data_from_sql(query.find_course_instructor(subject, number))[0][0]
     is_fav = False
 
     q = "SELECT MIN(subject), min(number), min(crn), min(title), SUM(ap), SUM(a), SUM(am), SUM(bp), SUM(b), SUM(bm), SUM(cp), SUM(c), SUM(cm), \
@@ -272,8 +270,9 @@ def course_info():
 def course():
     subject = request.args.get('subject', None)
     number = request.args.get('number', None)
-    title = request.args.get('title', \
-         get_data_from_sql(query.find_course_instructor(subject, number))[0][0])
+    title = request.args.get('title', None)
+    if(not title and len(get_data_from_sql(query.find_course_instructor(subject, number)))>0): 
+        title = get_data_from_sql(query.find_course_instructor(subject, number))[0][0]
     is_fav = False
 
     if 'user' in session:
@@ -284,9 +283,8 @@ def course():
             """.format(email = session['user'], subject=subject, number=number)
         data=get_data_from_sql(q)
         if(data): is_fav = True
-        print(is_fav)
     return render_template('course_detail.html', subject=subject, number=number, title=title, is_fav=is_fav)
-
+    # would jump to course_info
 ############## Bipartite Graph ##############
 
 @app.route('/graph')
@@ -312,15 +310,18 @@ def graph_objects():
             'type': 'group0',
             'depends': course,
             'dependedOnBy': [],
+            # 'docs': []
             'docs': retrieve_ratemyprofessor(inst)   #'Sounds good...'
         }
     for course,inst in course2inst.items():
+        url = request.url_root + "search?q=" + course + "&no_entend=1"
+        doc_src = "<iframe src=\'%s\' onload=\"autoResize(this)\" height=\"800px\" width=\"100%%\" frameborder=\"0\"> </iframe>" % url
         d['data'][course] = {
             'name': course,
             'type': 'group1',
             'depends': [],
             'dependedOnBy': inst,
-            'docs': 'Sounds Good...'
+            'docs': doc_src
         }
     return json.dumps(d)
 
