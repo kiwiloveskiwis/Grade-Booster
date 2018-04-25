@@ -1,4 +1,4 @@
-from flask import Flask, Response, render_template, json, request, redirect, abort, session, jsonify, flash
+from flask import Flask, Response, render_template, json, request, redirect, abort, session, jsonify, flash, url_for
 from flaskext.mysql import MySQL
 import simplejson as json
 import sys
@@ -48,7 +48,7 @@ def retrieve_ratemyprofessor(prof):
         print ('error', prof)
         
     # print (url)
-    url = "<iframe src=\'%s\' onload=\"autoResize(this)\" height=\"800px\" width=\"100%%\" frameborder=\"0\"> </iframe>" % url
+    url = "<iframe src=\'%s\' height=\"800px\" width=\"100%%\" frameborder=\"0\"> </iframe>" % url
     prof2doc[prof] = url
     return url
 
@@ -114,7 +114,9 @@ def search():
     except:
         course_info=None
     # otherwise, search for a course
-    return redirect('/course?subject=%s&number=%s'%(sbj, number))
+    url = url_for('course', _scheme="https", _external=True) + '?subject=%s&number=%s'%(sbj, number)
+    print (url)
+    return redirect(url)
 
 @app.route('/explore')
 def explore():
@@ -310,12 +312,12 @@ def graph_objects():
             'type': 'group0',
             'depends': course,
             'dependedOnBy': [],
-            # 'docs': []
+	    # 'docs': []
             'docs': retrieve_ratemyprofessor(inst)   #'Sounds good...'
         }
     for course,inst in course2inst.items():
-        url = request.url_root + "search?q=" + course + "&no_entend=1"
-        doc_src = "<iframe src=\'%s\' onload=\"autoResize(this)\" height=\"800px\" width=\"100%%\" frameborder=\"0\"> </iframe>" % url
+        url = request.url_root.replace("http://", "https://") + "search?q=" + course ; print(url)
+        doc_src = """<iframe src=\'%s\' height=\"800px\" width=\"100%%\" frameborder=\"0\"> </iframe>""" % url; 
         d['data'][course] = {
             'name': course,
             'type': 'group1',
